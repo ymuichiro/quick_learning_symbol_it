@@ -1,8 +1,8 @@
 remote_theme: rundocs/jekyll-rtd-theme
 title: Quick Learning Symbol
 description: Blockchain Symbol learning content
-lang: en
+lang: it
 baseurl: ""
-url: "https://learn.en.symbol-community.com"
+url: "https://learn.it.symbol-community.com"
 google:
   gtag: G-VBB48C2L7W
