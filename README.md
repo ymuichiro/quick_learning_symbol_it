@@ -20,9 +20,8 @@ con l'aiuto della comunità giapponese
 
 ### [2.Impostare l'ambiente di sviluppo](./02_setting.md)
 
-<<<<<<< HEAD
 ### [3.Indirizzo sulla catena di blocchi](./03_account.md)
-=======
+
 - [3.1 Account](03_account.md#31-creating-an-account)
 - [3.2 A TransferTransaction to another account](03_account.md#32-a-transfertransaction-to-another-account)
 - [3.3 Check account information](03_account.md#33-check-account-information)
