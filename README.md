@@ -20,7 +20,14 @@ con l'aiuto della comunità giapponese
 
 ### [2.Impostare l'ambiente di sviluppo](./02_setting.md)
 
+<<<<<<< HEAD
 ### [3.Indirizzo sulla catena di blocchi](./03_account.md)
+=======
+- [3.1 Account](03_account.md#31-creating-an-account)
+- [3.2 A TransferTransaction to another account](03_account.md#32-a-transfertransaction-to-another-account)
+- [3.3 Check account information](03_account.md#33-check-account-information)
+- [3.4 Tips for use](https://github.com/xembook/quick_learning_symbol/blob/main/03_account.md#34-%E7%8F%BE%E5%A0%B4%E3%81%A7%E4%BD%BF%E3%81%88%E3%82%8B%E3%83%92%E3%83%B3%E3%83%88)
+>>>>>>> 4030809808aa26a8fe2f0578306dea24f719f309
 
 - [3.1 Indirizzo sulla catena di blocchi](03_account.md#31-Creazione di un Indirizzo)
 - [3.2 Trasferimento verso un Indirizzo](03_account.md#32-Trasferimento verso un Indirizzo)
