@@ -1,25 +1,27 @@
-# 2.Building a development environment
+# 2.Impostare l'ambiente di sviluppo
 
-This section explains how to read this document.
+Questa sezione descrive come leggere il documendo
 
-## 2.1 Language
+## 2.1 Linguaggio di programmazione
 
-All code will be written in JavaScript.
+Tutto il codice sorgente riportato nel libro è scritto in JavaScript
 
 ### SDK
 
 symbol-sdk-typescript-javascript v2.0.0  
 https://github.com/symbol/symbol-sdk-typescript-javascript
 
-Load The SDK above as browserify in the browser developer console.  
+Caricare l'SDK precedente come 'browserify' nella console di sviluppo del browser (F12)  
 https://github.com/xembook/nem2-browserify
 
-##### Note
+##### Nota
 
-Currently symbol-sdk v3.0.0 is released in alpha version, v 2.0.3 is deprecated.  
-And version 3 removed many of the rxjs-dependent features thus direct access to the REST API is recommended.
+Al momento della scrittura di questo documento la versione corrente
+dell'SDK symbol-sdk v3.0.0 è rilasciata in versione alpha,
+la versione  2.0.3 è deprecata. La versione 3 ha eliminato molte delle dipendenze 
+con rxjs perciò è preferibile fare chiamate dirette alle API REST. 
 
-### Reference
+### Riferimenti alla documentazione
 
 Symbol SDK for TypeScript and JavaScript  
 https://symbol.github.io/symbol-sdk-typescript-javascript/1.0.3/
@@ -27,44 +29,54 @@ https://symbol.github.io/symbol-sdk-typescript-javascript/1.0.3/
 Catapult REST Endpoints (1.0.3)  
 https://symbol.github.io/symbol-openapi/v1.0.3/
 
-## 2.2 Sample source code
+## 2.2 Codice sorgente degli esempi
 
-### Variable declaration
+### Dichiarazione di variabile
 
-In this document, we do not declare const because we want you to rewrite it repeatedly on the console to verify that it works. When developing applications, ensure security by declaring const.
+In questo documento, le dichiarazioni 'const' non vengono usate.
+Ciò si deve alla necessità di riscrivere ripetendo sulla console
+per eseguire la verifica del funzionamento.
+Nello sviluppo di applicazioni, assicurarsi di utilizzare dichiarazioni const a scopo di sicurezza.
 
-### Check output value
+### Controllo del valore in uscita
 
-Console.log() outputs the contents of the variable. Try out the output functions according to your preferences. The output is described under `>`. When practicing with a sample, try it without this part.
+Console.log() restituisce il contenuto della variabile. Provare le funzioni di output 
+a propria discrezione. L'output compare dopo '>' non includerlo dall'esempio.
 
-### Synchronous and asynchronous
+### Modo sincrono e asincrono 
 
-Some developers used to other languages may feel uneasy writing asynchronous processing, so unless there is a particular reason, the explanations are written without asynchronous processing.
+Alcuni sviluppatori abituati con altri linguaggi potrebbero trovarsi scomodi
+a scrivere processi asincroni, quindi a meno che non ci sia una ragione particolare,
+le spiegazioni sono date in modalità sincrona.
 
-### Account
+### Indirizzi
 
 #### Alice
 
-This manual focuses on the Alice account. We will continue to use the Alice account created in chapter 3 in subsequent chapters. Please go on reading this manual with sufficient XYM sent.
+Questo manuale si concentra sull'indirizzo di Alice. Continueremo ad utilizzare
+l'indirizzo di Alice creato nel capitolo 3, anche nei capitoli successivi.
+Per continuare la lettura di questo manuale, inviarci un quantitativo sufficiente di XYM.
 
 #### Bob
 
-Bob is created as an account for transacting with Alice, as required in the chapters. Others, such as Carol, are used in the multisig chapters.
+Verrà creato un indirizzo di Bob per le transazioni con Alice, come richiesto nei successivi capitoli.
+Altri, per esempio Carol, verrano usati nei capitoli dedicati alla cointestazione.
 
-### Fee
+### Commissioni
 
-In this document, transactions are created with a transaction fee multiplier of 100.
+In questo documento, le transazioni saranno create impostando il parametro 'moltiplicatore' valorizzato a 100.
 
-## 2.3 Preparations in advance
+## 2.3 Prescrizioni
 
-From the node list, open the page of any node with e.g. Chrome browser. This manual is based on the assumption of a testnet.
+Dalla lista dei nodi, apri con il browser la pagina relativa ad un nodo qualsiasi.
+Questo manuale assume di lavorare con la rete di test "Testnet".
 
 - Testnet
   - https://symbolnodes.org/nodes_testnet/
 - Mainnet
   - https://symbolnodes.org/nodes/
 
-Press F12 to open the developer console, and enter the following script.
+Premere F12 per aprire la console di sviluppo del browser, e incollare lo script seguente.
 
 ```js
 (script = document.createElement("script")).src =
@@ -72,7 +84,7 @@ Press F12 to open the developer console, and enter the following script.
 document.getElementsByTagName("head")[0].appendChild(script);
 ```
 
-Then, run the common logic that is used in almost all chapters.
+Quindi, eseguire le istruzioni in comune a tutti i capitoli.
 
 ```js
 NODE = window.origin; //The URL of the page is shown here.
@@ -92,7 +104,7 @@ function clog(signedTx) {
 }
 ```
 
-You are now ready to go.
-If the content of this manual is a little confusing, please refer to the Qiita article.
+L'ambiente è ora pronto.
+Se il contenuto di questo manuale dovesse creare confusione, fare riferimento all'articolo di Qiita.
 
 [Symbol ブロックチェーンのテストネットで送金を体験する](https://qiita.com/nem_takanobu/items/e2b1f0aafe7a2df0fe1b)
