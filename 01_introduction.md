@@ -61,7 +61,7 @@ Per leggere le sezioni 'Consigli pratici' di ogni capitolo, è richiesta una com
 trasversale delle funzionalità di Symbol, pertanto non sono indispensabili in prima lettura.
 
 
-## P Where Symbol differs from other 'smart' blockchains.
+## Su cosa differisce Symbol dalle altre blockchain 'smart'.
 
 La blockchain Symbol non usa 'smart contracts'. Una infrastruttura 'smart' 
 viene applicata al codice sorgente di Symbol. Gli scambi di informazioni e le
