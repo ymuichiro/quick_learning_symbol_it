@@ -1,8 +1,11 @@
-# 3.Account
+# 3.Indirizzo sulla catena di blocchi
 
-An account is a data deposit structure in which information and assets associated with a private key is recorded. Only by signing with the private key associated with the account is the data updated on the blockchain.
+Un indirizzo è una struttura dati di memorizzazione delle informazioni
+e dei dati, divenuti beni di proprietà perchè associati ad una chiave privata.
+Condizione necessaria e sufficiente per la loro registrazione e aggiornamento nella blockchain
+è applicarvi l'operazione di firma con la chiave privata dell'Indirizzo.
 
-## 3.1 Creating an account
+## 3.1 Creazione di un indirizzo
 
 The account contains a key pair, which is a set of private and public keys, an address and other information. First of all, try creating an account  randomly and check the information that is contained.  
 
