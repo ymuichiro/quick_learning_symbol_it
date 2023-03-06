@@ -22,7 +22,7 @@ con l'aiuto della comunità giapponese
 
 ### [3.Indirizzo sulla catena di blocchi](./03_account.md)
 
-- [3.1 Creazione di un Indirizzo](03_account.md#3.1 Creazione di un Indirizzo)
+- [3.1 Creazione di un Indirizzo](03_account.md#31-creazione-di-un-indirizzo)
 - [3.2 Trasferimento verso un Indirizzo](03_account.md#32-Trasferimento verso un Indirizzo)
 - [3.3 Verifica dei dati di un Indirizzo](03_account.md#33-Verifica dei dati di un Indirizzo)
 - [3.4 Consigli pratici](03_account.md#34-Consigli pratici)
