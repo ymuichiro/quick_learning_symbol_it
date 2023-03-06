@@ -1,27 +1,29 @@
-# 3.Indirizzo sulla catena di blocchi
+# 3. Indirizzo sulla catena di blocchi
 
-Un indirizzo è una struttura dati di memorizzazione delle informazioni
-e dei dati, divenuti beni di proprietà perchè associati ad una chiave privata.
+Un indirizzo è una struttura dati di memorizzazione delle informazioni,
+divenute beni di proprietà perchè associati ad una chiave privata.
 Condizione necessaria e sufficiente per la loro registrazione e aggiornamento nella blockchain
 è applicarvi l'operazione di firma con la chiave privata dell'Indirizzo.
 
 ## 3.1 Creazione di un indirizzo
 
-The account contains a key pair, which is a set of private and public keys, an address and other information. First of all, try creating an account  randomly and check the information that is contained.  
+L'Indirizzo contiene una coppia di chiavi, ovvero un insieme di chiavi pubbliche
+e chiavi private, il nome dell'Indirizzo stesso e altre informazioni.
+Per prima cosa, creeremo un Indirizzo casuale e controlleremo le informazioni ivi contenute.
 
-### Create a new account 
+### Creazione di un nuovo Indirizzo 
 ```js
 alice = sym.Account.generateNewAccount(networkType);
 console.log(alice);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > Account
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
     keyPair: {privateKey: Uint8Array(32), publicKey: Uint8Array(32)}
 ```
 
-networkType is the following.
+indicazione dei valori per i tipi di rete (networkType).
 ```js
 {104: 'MAIN_NET', 152: 'TEST_NET'}
 ```
