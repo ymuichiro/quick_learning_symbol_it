@@ -1,6 +1,6 @@
 # 2.Impostare l'ambiente di sviluppo
 
-Questa sezione descrive come leggere il documendo
+Questa sezione descrive come leggere il documento
 
 ## 2.1 Linguaggio di programmazione
 
