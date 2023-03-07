@@ -97,7 +97,7 @@ console.log(aliceAddress);
     networkType: 152
 ```
 
-## 3.2 Transferimento verso un Indirizzo
+## 3.2 Trasferimento verso un Indirizzo
 
 Creare un Indirizzo non è sufficiente a trasferire informazioni nella blockchain.
 Le blockchain pubbliche obbligano a versare delle commissioni di trasferimento dati
