@@ -23,12 +23,12 @@ console.log(alice);
     keyPair: {privateKey: Uint8Array(32), publicKey: Uint8Array(32)}
 ```
 
-indicazione dei valori per i tipi di rete (networkType).
+###### indicazione dei valori per i tipi di rete (networkType).
 ```js
 {104: 'MAIN_NET', 152: 'TEST_NET'}
 ```
 
-### Deriving private and public key.
+### Estrarre la chiave privata e la chiave pubblica
 ```js
 console.log(alice.privateKey);
 console.log(alice.publicKey);
@@ -38,12 +38,17 @@ console.log(alice.publicKey);
 > D4933FC1E4C56F9DF9314E9E0533173E1AB727BDB2A04B59F048124E93BEFBD2
 ```
 
-#### Notes
-If the private key is lost, the data associated with that account can never be changed and any funds will be lost. In addition, the private key must not be shared with others since knowledge of the private key will give full access to the account. 
-In general web services, passwords are allocated to an "account ID", so passwords can be changed from the account, but in blockchain, a unique ID (address) is allocated to the private key that is the password, thus it is not possible to change or re-generate the private key associated with an account from the account.  
+#### Note
+La perdita della chiave privata implica la perdita irrevocabile di ogni dato interno all'Indirizzo,
+tutte le quantità finanziarie andranno perse. Inoltre la chiave privata non deve essere condivisa
+con terze parti eccezzion fatta per i casi in cui sia necessario fornire il controllo completo dell'Indirizzo.
+Nello sviluppo di web services generici, le password vengono memorizzate in un "account ID", 
+in modo da poter cambiare le password partendo dall'Indirizzo. Diversamente nella blockchain,
+l'ID (Indirizzo) è univocamente legato alla chiave privata che svolge la funzione di password,
+quindi non è possibile cambiare o rigenerare la chiave privata associata ad un Indirizzo partendo dal nome.
 
 
-### Deriving of address
+###  Calcolo del nome dell'Indirizzo
 ```js
 aliceRawAddress = alice.address.plain();
 console.log(aliceRawAddress);
@@ -52,9 +57,9 @@ console.log(aliceRawAddress);
 > TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ
 ```
 
-These things above are the most basic information for operating the blockchain. It is also better to check how to generate accounts from a private key and how to generate classes that only deal with publickey and addresses.  
+###### Quanto esposto prima costituisce le informazioni di base per operare con la blockchain. E' utile provare a creare Indirizzi dalla chiave privata ma anche creare classi che si istanziano dalla chiave pubblica o dal nome dell'Indirizzo.
 
-### Account generation from private key.
+### Creazione di un Indirizzo a partire dalla chiave privata
 ```js
 alice = sym.Account.createFromPrivateKey(
   "1E9139CC1580B4AED6A1FE110085281D4982ED0D89CE07F3380EB83069B1****",
@@ -62,7 +67,7 @@ alice = sym.Account.createFromPrivateKey(
 );
 ```
 
-### Public key class generation
+### Istanziare la classe Indirizzo pubblico partendo dalla chiave pubblica
 ```js
 alicePublicAccount = sym.PublicAccount.createFromPublicKey(
   "D4933FC1E4C56F9DF9314E9E0533173E1AB727BDB2A04B59F048124E93BEFBD2",
@@ -70,7 +75,7 @@ alicePublicAccount = sym.PublicAccount.createFromPublicKey(
 );
 console.log(alicePublicAccount);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > PublicAccount
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -78,31 +83,35 @@ console.log(alicePublicAccount);
 
 ```
 
-### Address class generation
+### Istanziare la classe Indirizzo
 ```js
 aliceAddress = sym.Address.createFromRawAddress(
   "TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ"
 );
 console.log(aliceAddress);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > Address
     address: "TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ"
     networkType: 152
 ```
 
-## 3.2 A TransferTransaction to another account
+## 3.2 Transferimento verso un Indirizzo
 
-Creating an account does not simply mean that data can be transferred on the blockchain.  
-Public blockchains require fees for data transfer in order to utilise resources effectively.  
-On the Symbol blockchain, fees are paid with a native token which is called XYM.  
-Once you have generated an account, send XYM to the account to cover transaction fees (described in later chapters).   
+Creare un Indirizzo non è sufficiente a trasferire informazioni nella blockchain.
+Le blockchain pubbliche obbligano a versare delle commissioni di trasferimento dati
+quando si consumano risorse.
+Nella blockchain Symbol, le commissioni si pagano con il token nativo chiamato XYM.
+Una quantità di XYM sarà trasferita all'Indirizzo dopo averlo creato, a copertura delle commissioni
+della transazione (come vedremo in seguito).
 
-### Receive XYM from the faucet
+### Ricezione di XYM dal faucet
 
-Testnet XYM can be obtained for free using the faucet.  
-For Mainnet transactions, you can buy XYM on exchanges, or use tipping services such as NEMLOG and QUEST to have obtain donations.   
+Monete XYM della rete di test (testnet) si possono ricevere senza costi dal rubinetto 'faucet'.
+Per eseguire transazioni sulla rete di produzione (mainnet), gli XYM possono
+essere acquistati nei siti di cambiovaluta (exchange), o dai servizi
+di donazioni per prestazioni occasionali, quali NEMLOG e QUEST.
 
 Testnet
 - FAUCET
@@ -116,27 +125,28 @@ Mainnet
 
 
 
-### Using the explorer
+### Ispezionare la blockchain con l'explorer
 
-Transactions can be viewed in the explorer after transferring from the faucet to the account you have created.
+L'applicazione web 'explorer' ritorna l'elenco delle transazioni, compresa quella dal faucet al nostro Indirizzo
+appena creato.
 
 - Testnet
   - https://testnet.symbol.fyi/
 - Mainnet
   - https://symbol.fyi/
 
-## 3.3 Check account information
+## 3.3 Verifica dei dati di un indirizzo
 
-Retrieve the account information stored by the node.
+Per la verifica è necessario recuperare le informazioni dell'Indirizzo memorizzate in un nodo della rete.
 
-### Retrieve a list of owned mosaics
+### Recuperare la lista dei Mosaic associati all'Indirizzo
 
 ```js
 accountRepo = repo.createAccountRepository();
 accountInfo = await accountRepo.getAccountInfo(aliceAddress).toPromise();
 console.log(accountInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > AccountInfo
     address: Address {address: 'TBXUTAX6O6EUVPB6X7OBNX6UUXBMPPAFX7KE5TQ', networkType: 152}
@@ -149,33 +159,36 @@ console.log(accountInfo);
 ```
 
 #### publicKey
-Account information which has just been created on the client side and has not yet been involved in a transaction on the blockchain is not recorded. Account information will be stored on the blockchain when when the address first appears in a transaction. Therefore, the publicKey is noted as `00000...` at this moment.
+Tutte le informazioni di un Indirizzo appena creato dal client non verranno memorizzate nella blockchain
+se l'Indirizzo non sarà oggetto di una transazione. Ciò spiega il valore `00000...` ritornato per la chiave pubblica.
 
 #### UInt64
-JavaScript will overflow when numbers are too large, so ID and amount are managed in the SDK's own format called UInt64. Use toString() to convert to string, compact() to convert to number and toHex()  to convert to a hexadecimal.
+Per ovviare ai limiti dei tipi del linguaggio JavaScript e conseguenti overflow numerici, i campi `ID` e `amount`
+sono definiti come tipo `UInt64` dichiarato nell'SDK . Usare `String()` per la conversione in stringa,
+`compact()` per convertire in numero e `toHex()` per convertire in esadecimale.
 
 ```js
-console.log("addressHeight:"); //Block height at which the address is recorded
-console.log(accountInfo.addressHeight.compact()); //Numerics
+console.log("addressHeight:"); //Altezza del blocco in cui l'Indirizzo è memorizzato
+console.log(accountInfo.addressHeight.compact()); //Numerici
 accountInfo.mosaics.forEach(mosaic => {
-  console.log("id:" + mosaic.id.toHex()); //Hexadecimal
-  console.log("amount:" + mosaic.amount.toString()); //String
+  console.log("id:" + mosaic.id.toHex()); //Esadecimale
+  console.log("amount:" + mosaic.amount.toString()); //Stringa
 });
 ```
 
-Inverting an ID value that is too large into a numerical value with COMPACT may result in an error.  
-`Compacted value is greater than Number.Max_Value.`
+Scambiare un valore di tipo `ID` grande con un valore numerico di tipo `COMPACT` potrebbe dare errore.
+
+`La dimensione di un COMPACT è maggiore di  Number.Max_Value.`
 
 
-#### Adjustment of display digits
-
-Treating the amount of owned tokens as an integer value to avoid rounding errors. We can get the divisibility from the token definition, so we can use that value to display the exact amount of owned tokens.  
+#### Impostare il fattore di scala
+Il numero di token che si possiedono è un numero intero per evitare errori di arrotondamento. Possiamo recuperare il fattore di scala dall'istanza di definizione del token per visualizzare il numero corretto di quanti se ne possiedono.
 
 ```js
 mosaicRepo = repo.createMosaicRepository();
 mosaicAmount = accountInfo.mosaics[0].amount.toString();
 mosaicInfo = await mosaicRepo.getMosaic(accountInfo.mosaics[0].id).toPromise();
-divisibility = mosaicInfo.divisibility; //Divisibility
+divisibility = mosaicInfo.divisibility; //fattore di scala
 if(divisibility > 0){
   displayAmount = mosaicAmount.slice(0,mosaicAmount.length-divisibility)  
   + "." + mosaicAmount.slice(-divisibility);
@@ -185,23 +198,26 @@ if(divisibility > 0){
 console.log(displayAmount);
 ```
 
-## 3.4 Tips for use
-### Encryption and signatures
+## 3.4 Consigli pratici
+### Cifratura e firma
 
-Both private and public keys generated for an account can be used for conventional encryption and digital signatures. Data confidentiality and legitimacy can be verified on a p2p (end-to-end) basis, even if applications have reliability issues.   
+La chiave privata, ma anche la pubblica di un Indirizzo, possono essere usate per operazioni di 
+cifratura e firma digitale. Si possono verificare la segretezza e la paternità ai due estremi 
+di una comunicazione, persino in condizioni di applicazioni inaffidabili.
 
-#### Advance preparation: generating Bob account for connectivity test
+#### Prova avanzata: creare l'Indirizzo di Bob per un test di trasmissione
 ```js
 bob = sym.Account.generateNewAccount(networkType);
 bobPublicAccount = bob.publicAccount;
 ```
 
-#### Encryption
+#### Cifratura
 
-Encrypt with Alice's private key and Bob's public key and decrypt with Alice's public key and Bob's private key (AES-GCM format).
+Cifrare un messaggio con la chiave privata di Alice, poi cifrarlo con la chiave pubblica di Bob,
+il risultato ottenuto decifrarlo con la chiave privata di Bob, poi con la chiave pubblica di Alice (formato AES-GCM).
 
 ```js
-message = 'Hello Symol!';
+message = 'Hello Symbol!';
 encryptedMessage = alice.encryptMessage(message ,bob.publicAccount);
 console.log(encryptedMessage);
 ```
@@ -220,12 +236,12 @@ decryptMessage = bob.decryptMessage(
 console.log(decryptMessage);
 ```
 ```js
-> "Hello Symol!"
+> "Hello Symbol!"
 ```
 
-#### Signature
+#### Firma
 
-Sign the message with Alice's private key and verify the message with Alice's public key and signature.
+Firma del messaggio con la chiave privata di Alice e verifica della firma con la chiave pubblica di Alice.
 
 ```js
 Buffer = require("/node_modules/buffer").Buffer;
@@ -237,7 +253,7 @@ console.log(signature);
 > B8A9BCDE9246BB5780A8DED0F4D5DFC80020BBB7360B863EC1F9C62CAFA8686049F39A9F403CB4E66104754A6AEDEF8F6B4AC79E9416DEEDC176FDD24AFEC60E
 ```
 
-#### Verification
+#### Verifica
 ```js
 isVerified = sym.KeyPair.verify(
   alice.keyPair.publicKey,
@@ -250,52 +266,53 @@ console.log(isVerified);
 > true
 ```
 
-Note that signatures that do not use the blockchain may be re-used many times.
+Notare che se le firme non usano la blockchain possono essere riutilizzate più volte.
 
-### Account management
+### Gestione dell'Indirizzo
 
-This section explains how to manage your account.  
-Private keys should not be stored as plaintext; here is how to encrypt and store your private key with a passphrase using symbol-qr-library.  
+Questa sezione spiega come gestire il tuo Indirizzo.
+Le chiavi private non dovrebbero essere memorizzate in chiaro; ecco come cifrare e
+memorizzare la tua chiave privata con una password chiamando la libreria `symbol-qr-library`.
 
-#### Encryption of private key
+#### Cifratura della chiave privata
 
 ```js
 qr = require("/node_modules/symbol-qr-library");
 
-//Passphrase-Locked account generation
+//Creazione di un Indirizzo protetto da password
 signerQR = qr.QRCodeGenerator.createExportAccount(
   alice.privateKey, networkType, generationHash, "Passphrase"
 );
 
-//QR code display
+//Mostra il QR code 
 signerQR.toBase64().subscribe(x =>{
 
-  //Example of displaying a QR code on an HTML body
+  //Esempio per visualizzare il QR code per linguaggio HTML
   (tag= document.createElement('img')).src = x;
   document.getElementsByTagName('body')[0].appendChild(tag);
 });
 
-//Display accounts as encrypted JSON data
+//Visualizzare un Indirizzo cifrato nel formato JSON
 jsonSignerQR = signerQR.toJSON();
 console.log(jsonSignerQR);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > {"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836","data":{"ciphertext":"e9e2f76cb482fd054bc13b7ca7c9d086E7VxeGS/N8n1WGTc5MwshNMxUiOpSV2CNagtc6dDZ7rVZcnHXrrESS06CtDTLdD7qrNZEZAi166ucDUgk4Yst0P/XJfesCpXRxlzzNgcK8Q=","salt":"54de9318a44cc8990e01baba1bcb92fa111d5bcc0b02ffc6544d2816989dc0e9"}}
 ```
-The QR code or text output by this jsonSignerQR can be saved to recover the private key any time.
+Il QR code o il testo di questo `jsonSignerQR` può essere salvato per estrarre la chiave privata in qualsiasi momento.
 
-#### Decryption of encrypted private key
+#### Decifrare una chiave privata cifrata
 
 ```js
-//Assign stored text or text retrieved from a QR code scan into json signer QR
+//Assegnazione di testo o testo recuperato da una scansione di un QR code nel formato json signer QR
 jsonSignerQR = '{"v":3,"type":2,"network_id":152,"chain_id":"7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836","data":{"ciphertext":"e9e2f76cb482fd054bc13b7ca7c9d086E7VxeGS/N8n1WGTc5MwshNMxUiOpSV2CNagtc6dDZ7rVZcnHXrrESS06CtDTLdD7qrNZEZAi166ucDUgk4Yst0P/XJfesCpXRxlzzNgcK8Q=","salt":"54de9318a44cc8990e01baba1bcb92fa111d5bcc0b02ffc6544d2816989dc0e9"}}';
 
 qr = require("/node_modules/symbol-qr-library");
 signerQR = qr.AccountQR.fromJSON(jsonSignerQR,"Passphrase");
 console.log(signerQR.accountPrivateKey);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > 1E9139CC1580B4AED6A1FE110085281D4982ED0D89CE07F3380EB83069B1****
 ```
