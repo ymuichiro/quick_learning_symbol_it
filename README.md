@@ -29,11 +29,11 @@ con l'aiuto della comunità giapponese
 
 ### [4.Transazioni](./04_transaction.md)
 
-- [4.1 Sequenza di una transazione](04_transaction.md#41-le-tappe-di-unatransazione)
+- [4.1 Le tappe di una transazione](04_transaction.md#41-le-tappe-di-una-transazione)
 - [4.2 Inizializzazione](04_transaction.md#42-inizializzazione)
-- [4.3 Firma e notifica](04_transaction.md#43-firma-e-propagazione-notifica-alla-rete)
+- [4.3 Firma e propagazione (notifica alla rete)](04_transaction.md#43-firma-e-propagazione-notifica-alla-rete)
 - [4.4 Convalida](04_transaction.md#44-convalida)
-- [4.5 Cronologia di un Indirizzo](04_transaction.md#45-cronologia-delle-transazioni)
+- [4.5 Cronologia delle transazioni](04_transaction.md#45-cronologia-delle-transazioni)
 - [4.6 Gruppo di transazioni](04_transaction.md#46-gruppo-di-transazioni)
 - [4.7 Consigli pratici](04_transaction.md#47-consigli-pratici)
 
