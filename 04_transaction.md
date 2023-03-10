@@ -1,39 +1,43 @@
-# 4.Transaction
-Updating data on the blockchain is done by announcing transactions to the network.
+# 4.Transazioni
 
-## 4.1 Transaction lifecycle
+La scrittura sulla blockchain va fatta annunciando ogni transazione alla rete.
 
-Below is a description of the lifecycle of a transaction:
+## 4.1 Le tappe di una transazione 
 
-- Transaction creation
-  - Create transactions in an acceptable format for the blockchain.
-- Signature
-  - Sign the transaction with the account's privatekey.
-- Announcement
-  - Announce a signed transaction to any node on the network.
-- Unconfirmed state transactions
-  - Transactions accepted by a node are propagated to all nodes as unconfirmed state transactions.
-    - In a case where the maximum fee set for a transaction is not enough for the minimum fee set for each node, it will not be propagated to that node.
-- Confirmed transaction
-  - When an unconfirmed transaction is contained in a subsequent new block (generated approximately every 30 seconds), it becomes an approved transaction.
-- Rollbacks
-  - Transactions that could not reach a consensus agreement between nodes are rolled back to an unconfirmed state.
-    - Transactions that have expired or overflowed the cache are truncated.
-- Finalise
-  - Once the block is finalised by the finalisation process of the voting node, the transaction can be treated as final and data can no longer be rolled back.
+Viene descritta la casistica delle possibili tappe nella vita di una transazione:
 
-### What is a block?
+- Creazione della transazione
+  - Va seguito necessariamente un formato accettato dalla blockchain.
+- Firma
+  - La transazione è firmata con la chiave privata dell'Indirizzo.
+- Propagazione (notifica alla rete)
+  - Una transazione firmata si annuncia a ciascun nodo della rete.
+- Transazioni nello stato di 'non confermata'
+  - Le transazioni che sono state accettate da un nodo vengono propagate a tutti i nodi, si trovano in stato di 'non confermata'.
+    - Quando in una transazione è stato impostato il massimo valore accettabile di commissione e questo valore è inferiore al valore della commissione minima impostata da un nodo, quel nodo non propagherà la transazione.  
+- Transazione 'confermata'
+  - Quando una transazione 'non confermata' viene inclusa nel blocco successivo della blockchain, la cui cadenza è approssimativamente un intervallo di 30 secondi, la transazione diventa 'approvata'.
+- Rollback
+  - Le transazioni che non ottengono il consenso per mancanza di accordo tra i nodi, vengono riportate allo stato di 'non confermata'.
+    - Le transazioni scadute o scartate dalla cache vengono troncate.
+- Finality (Irrevocabilità)
+  - Un blocco della catena viene detto 'irrevocabile' quando è stato oggetto di finalizzazione da un nodo elettore, le transazioni di tale blocco sono dette 'final' e diventano irreversibili. 
 
-Blocks are generated approximately every 30 seconds and are synchronised with other nodes on a block-by-block basis with priority given to transactions that have paid higher fees.
-If synchronisation fails, it is rolled back and the network repeats this process until consensus agreement is reached across all nodes.
+### Cos'è un blocco?
 
-## 4.2 Transaction creation
+Nuovi blocchi vengono aggiunti ad intervalli di 30 secondi circa, quindi sincronizzati con gli altri
+nodi facendo un confronto blocco a blocco, le transazioni da includere vengono ordinate 
+in modo decrescente per valore della commissione, quelle che pagano di più avranno priorità più alta.
+Nel caso in cuil fallisca la sincronizzazione, il processo riparte e riprende in un ciclo che si conclude
+al raggiungimento dell'accordo di consenso tra tutti i nodi della rete.
 
-First of all, start with creating the most basic transfer transaction.
+## 4.2 Inizializzazione
 
-### Transfer transaction to Bob
+Per prima cosa, iniziare con la creazione di una semplice transazione di trasferimento.
 
-Create the Bob address to send to.
+### Trasferimento a Bob
+
+Creare l'Indirizzo di Bob al quale inviare valore.
 ```js
 bob = sym.Account.generateNewAccount(networkType);
 console.log(bob.address);
@@ -42,66 +46,73 @@ console.log(bob.address);
 > Address {address: 'TDWBA6L3CZ6VTZAZPAISL3RWM5VKMHM6J6IM3LY', networkType: 152}
 ```
 
-Create transaction.
+Creare la transazione.
 ```js
 tx = sym.TransferTransaction.create(
-    sym.Deadline.create(epochAdjustment), //Deadline:Expiry date
+    sym.Deadline.create(epochAdjustment), //Deadline: data di scadenza
     sym.Address.createFromRawAddress("TDWBA6L3CZ6VTZAZPAISL3RWM5VKMHM6J6IM3LY"), 
     [],
-    sym.PlainMessage.create("Hello Symbol!"), //Message
-    networkType //Testnet/Mainnet classification
-).setMaxFee(100); //Fees
+    sym.PlainMessage.create("Hello Symbol!"), //Messaggio
+    networkType //indicazione della rete Testnet/Mainnet 
+).setMaxFee(100); //Commissioni
 ```
 
-Each setting is explained below.
+Descrizione dei parametri.
 
-#### Expiry date
-2 hours is the SDK's default setting. 
-A maximum of 6 hours can be specified.
+#### Data di scadenza
+Il valore predefinito nell'SDK è impostato a 2 ore.
+Il valore massimo assegnabile è di 6 ore.
 ```js
 sym.Deadline.create(epochAdjustment,6)
 ```
 
-#### Message
-In a message field, up to 1023 bytes can be attached to a transaction.
-Also binary data can be sent as raw data.
+#### Messaggio
+Il campo del messaggio della transazione, può contenere fino ad un massimo di 1023 Byte.
+Nel messaggio sono ammessi anche caratteri binari (raw data).
 
-##### Empty message
+##### Messaggio vuoto
 ```js
 sym.EmptyMessage
 ```
 
-##### Plain message
+##### Messaggio di testo in chiaro
 ```js
 sym.PlainMessage.create("Hello Symbol!")
 ```
 
-##### Encrypted message
+##### Messaggio cifrato
 ```js
 sym.EncryptedMessage('294C8979156C0D941270BAC191F7C689E93371EDBC36ADD8B920CF494012A97BA2D1A3759F9A6D55D5957E9D');
 ```
 
-When you use EncryptedMessage, a flag (marker) is attached to the message that means 'the specified message is encrypted'. The explorer and wallet will use the flag as a reference to hide it or not decode the message. Encryption is not made by the method itself.
+Per inserire un messaggio cifrato, bisogna segnarlo con un marcatore (flag), che viene appeso e consente di distinguerlo
+dai messaggi non cifrati. Le applicazioni, per es. Explorer e Wallet, useranno tale flag per trattarlo di conseguenza.
+La cifratura non è calcolata all'interno del metodo.
 
-
-##### Raw data
+##### Dati binari
 ```js
 sym.RawMessage.create(uint8Arrays[i])
 ```
 
-#### Maximum fee
+#### Limite massimo sul valore delle commissioni
 
-Although paying a small additional fee is better to ensure a transaction is successful, having some knowledge about network fees is a good idea.
-The account specifies the maximum fee it is willing to pay when it creates the transaction.
-On the other hand, nodes try to harvest only the transactions with the highest fees into a block at a time.
-This means that if there are many other transactions that are willing to pay more, the transaction will take longer to be approved.
-Conversely, if there are many other transactions that want to pay less and your maximum fee is larger, then the transaction will be processed with a fee below the maximum value you set.
+Sebbene pagare leggermente di più da' una maggior garanzia che la transazione venga convalidata, 
+è opportuno dare qualche dettaglio in più sull'argomento.
+L'Indirizzo dichiara il valore massimo di commissioni che è disposto a pagare, nel momento della creazione di una transazione.
+Per contro, i nodi perseguono la politica di raccogliere ed includere di volta in volta nel blocco, solo le transazioni che pagano di più.
+Di conseguenza vi è competizione quando molte altre transazioni, offrendo commissioni più alte della nostra, scavalcano la coda con l'effetto di prolungare il tempo della nostra elaborazione.
+Viceversa, se ci sono molte altre transazioni che offrono meno della nostra, il prezzo della commissione che pagheremo
+non sarà quello dichiarato ma inferiore.
 
-The fee paid is determined by a transaction size x feeMultiplier.
-If it was 176 bytes and your maxFee is set at 100, 17600µXYM = 0.0176XYM is the maximum value you allow to be paid as a fee for the transaction.
-There are two ways to specify this: as feeMultiplier = 100 or as maxFee = 17600.
+La commissione pagata viene calcolata con la formula data dal prodotto tra la dimensione della transazione
+e il fattore moltiplicativo di commissione.
+Per esempio, una transazione di 176 Bytes, con commissione massima `maxFee` valorizzata a 100, otteniamo
+17600µXYM = 0.0176XYM 
+essendo il valore massimo che si è disposti a pagare per questa transazione.
+Ci sono due modi equivalenti di impostarlo, un primo modo è quello di valorizzare
+`feeMultiplier` a 100, il secondo modo è di valorizzare direttamente `maxFee` a 17600.
 
-##### To specify as feeMultiprier = 100
+##### Come dichiarare feeMultiprier = 100
 ```js
 tx = sym.TransferTransaction.create(
   ,,,,
@@ -109,7 +120,7 @@ tx = sym.TransferTransaction.create(
 ).setMaxFee(100);
 ```
 
-##### To specify as maxFee = 17600
+##### Come dichiarare maxFee = 17600
 ```js
 tx = sym.TransferTransaction.create(
   ,,,,
@@ -118,18 +129,18 @@ tx = sym.TransferTransaction.create(
 );
 ```
 
-We will use the method of specifying feeMultiplier = 100.
+Noi useremo il metodo che assegna `feeMultiplier = 100`.
 
-## 4.3 Signature and announcement
+## 4.3 Firma e propagazione (notifica alla rete)
 
-Sign the transaction which you create with the private key and announce it to any node.
+Firmare la transazione creata con la chiave privata e propagarla a tutti i nodi.
 
-### Signature
+### Firma
 ```js
 signedTx = alice.sign(tx,generationHash);
 console.log(signedTx);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > SignedTransaction
     hash: "3BD00B0AF24DE70C7F1763B3FD64983C9668A370CB96258768B715B117D703C2"
@@ -140,19 +151,19 @@ console.log(signedTx);
     type: 16724
 ```
 
-The Account class and generationHash value are required to sign the transaction.
+Per firmare una transazionè vanno valorizzati l'Indirizzo e il campo `generationHash`
 
 generationHash
 - Testnet
-    - 7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836
+    - `7FCCD304802016BEBBCD342A332F91FF1F3BB5E902988B352697BE245F48E836`
 - Mainnet
-    - 57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6
+    - `57F7DA205008026C776CB6AED843393F04CD458E0AA2D9F1D5F31A402072B2D6`
 
-The generationHash value uniquely identifies the blockchain network.
-A signed transaction is created by interweaving the network's individual hash values so that they cannot be used by other networks with the same private key.
+Il valore del campo `generationHash` è unico e costante e dipende dal tipo di rete blockchain con cui si intende lavorare.
+Una transazione firmata è legata all'istanza della rete, per mezzo dell'impronta digitale della rete e ciò impedisce
+che la stessa transazione (stessa chiave privata) possa essere accettata in più di una rete.
 
-
-### Announcement
+### Propagazione (notifica alla rete)
 ```js
 res = await txRepo.announce(signedTx).toPromise();
 console.log(res);
@@ -161,29 +172,32 @@ console.log(res);
 > TransactionAnnounceResponse {message: 'packet 9 was pushed to the network via /transactions'}
 ```
 
-As in the script above, a response will be sent: `packet n was pushed to the network`, this means that the transaction has been accepted by the node.
-However, this only means that there were no anomalies in the formatting of the transaction.
-In order to maximise the response speed of the node, Symbol returns the response of the received result and disconnects the connection before verifying the content of the transaction. The response value is merely the receipt of this information. If there is an error in the format, the message response will be as follows:
+Come appena mostrato nell'esempio, l'operazione di propagazione ritorna la risposta
+ `packet n was pushed to the network`, quale conferma che la transazione è stata accettata dal nodo.
+La conferma indica solamente che non ci sono errori di ricezione della transazione.
+Per questioni di prestazioni, il nodo si disconnette subito dopo aver mandato la risposta di ricezione,
+prima di verificare il contenuto della transazione. Perciò tale risposta ha il solo scopo
+di notifica di ricezione. 
+In caso di errore nel contenuto, il messaggio di risposta sarà il seguente:
 
-
-##### Sample output of response if announcement fails
+##### Output esemplificativo di una risposta di fallimento di propagazione
 ```js
 Uncaught Error: {"statusCode":409,"statusMessage":"Unknown Error","body":"{\"code\":\"InvalidArgument\",\"message\":\"payload has an invalid format\"}"}
 ```
 
-## 4.4 Confirmation
+## 4.4 Convalida
 
 
-### Status confirmation
+### Stato di convalida
 
-Check the status of transactions accepted by the node.
+Controllo dello stato delle transazioni accettate dal nodo.
 
 ```js
 tsRepo = repo.createTransactionStatusRepository();
 transactionStatus = await tsRepo.getTransactionStatus(signedTx.hash).toPromise();
 console.log(transactionStatus);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > TransactionStatus
     group: "confirmed"
@@ -193,9 +207,10 @@ console.log(transactionStatus);
     height: undefined
 ```
 
-When it is approved, the output shows  ` group: "confirmed"` .
+In caso di convalida, l'output sarà  ` group: "confirmed"`.
 
-If it was accepted but an error occurred, the output will show as follows. Rewrite the transaction and try announcing it again.
+In caso di errore dopo l'accettazione della propagazione, l'output mostrato sarà il seguente.
+Riscrivere la transazione e provare a propagarla di nuovo.
 
 ```js
 > TransactionStatus
@@ -206,19 +221,22 @@ If it was accepted but an error occurred, the output will show as follows. Rewri
     height: undefined
 ```
 
-If the transaction has not been accepted, the output will show the ResourceNotFound error as follows.
+Quando la transazione non è stata convalidata, l'output conterrà l'errore `ResourceNotFound` come di seguito.
 ```js
 Uncaught Error: {"statusCode":404,"statusMessage":"Unknown Error","body":"{\"code\":\"ResourceNotFound\",\"message\":\"no resource exists with id '18AEBC9866CD1C15270F18738D577CB1BD4B2DF3EFB28F270B528E3FE583F42D'\"}"}
 ```
 
-This error occurs when the maximum fee specified in the transaction is less than the minimum fee set by the node, or if a transaction that is required to be announced as an aggregate transaction is announced as a single transaction.
+Questo errore, per esempio, indica che il valore massimo della commissione assegnato nella transazione,
+è minore del minimo ammesso dal nodo, similmente, se una tansazione è nella forma aggregata, ma viene
+propagata con l'indicazione di transazione singola (cfr. più oltre).
 
-### Approval Confirmation
+### Conferma di convalida
 
-It takes around 30 seconds for a transaction to be approved for the block.
+Sono richiesti 30 secondi per la convalida di una transazione e inserimento nel blocco.
 
-#### Check with the Explorer
-Search in Explorer using the hash value that can be retrieved with signedTx.hash.
+#### Controllo con l'applicazione Explorer
+Eseguire la ricerca nell'Explorer della blockchain, utilizzando il valore hash ritornato a seguito 
+dell'operazione di firma `signedTx.hash`.
 
 ```js
 console.log(signedTx.hash);
@@ -232,13 +250,13 @@ console.log(signedTx.hash);
 - Testnet　
   - https://testnet.symbol.fyi/transactions/661360E61C37E156B0BE18E52C9F3ED1022DCE846A4609D72DF9FA8A5B667747
 
-#### Check with the SDK
+#### Controllo con l'SDK
 
 ```js
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > TransferTransaction
     deadline: Deadline {adjustedValue: 12883929118}
@@ -261,12 +279,16 @@ console.log(txInfo);
 ```
 ##### Note
 
-Even when a transaction is confirmed in a block, the confirmation of the transaction still has the possibility of being revoked if a rollback occurs.
-After a block has been approved, the probability of a rollback occurring decreases as the approval process proceeds for several blocks.
-In addition, waiting for the finalisation block, which is carried out by voting nodes, ensures that the recorded data is certain.
+Per completezza, si fa notare che qualsiasi transazione a convalida confermata e inserita in un blocco,
+potrebbe, subire la revoca quando il nodo non ottiene il consenso (rollback).
+Dopo l'approvazione di un blocco, la probabilità di un evento rollback per quel blocco diminuisce con l'avanzare dei blocchi nella catena.
+La certezza assoluta che la transazione non subirà revoche avviene dopo il processo per l'irrevocabilità del blocco (finality),
+eseguito con il contributo dei nodi elettori.
 
-##### Sample script
-After announcing the transaction, it is useful to see the following script to keep track of the chain status.
+##### Codice esemplificativo
+
+Dopo la propagazione della transazione, è utile tener traccia dello stato della blockchain.
+
 ```js
 hash = signedTx.hash;
 tsRepo = repo.createTransactionStatusRepository();
@@ -276,9 +298,10 @@ txInfo = await txRepo.getTransaction(hash,sym.TransactionGroup.Confirmed).toProm
 console.log(txInfo);
 ```
 
-## 4.5 Transaction history
+## 4.5 Cronologia delle transazioni
 
-Get a list of the transaction history sent and received by Alice.
+Per recuperare la lista delle transazioni ricevute ed inviate da Alice.
+
 ```js
 result = await txRepo.search(
   {
@@ -293,7 +316,7 @@ txes.forEach(tx => {
   console.log(tx);
 })
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > TransferTransaction
     type: 16724
@@ -320,23 +343,25 @@ txes.forEach(tx => {
       merkleComponentHash: "308472D34BE1A58B15A83B9684278010F2D69B59E39127518BE38A4D22EEF31D"
 ```
 
-TransactionType is as follows.
+Il tipo della transazione è il seguente.
 ```js
 {0: 'RESERVED', 16705: 'AGGREGATE_COMPLETE', 16707: 'VOTING_KEY_LINK', 16708: 'ACCOUNT_METADATA', 16712: 'HASH_LOCK', 16716: 'ACCOUNT_KEY_LINK', 16717: 'MOSAIC_DEFINITION', 16718: 'NAMESPACE_REGISTRATION', 16720: 'ACCOUNT_ADDRESS_RESTRICTION', 16721: 'MOSAIC_GLOBAL_RESTRICTION', 16722: 'SECRET_LOCK', 16724: 'TRANSFER', 16725: 'MULTISIG_ACCOUNT_MODIFICATION', 16961: 'AGGREGATE_BONDED', 16963: 'VRF_KEY_LINK', 16964: 'MOSAIC_METADATA', 16972: 'NODE_KEY_LINK', 16973: 'MOSAIC_SUPPLY_CHANGE', 16974: 'ADDRESS_ALIAS', 16976: 'ACCOUNT_MOSAIC_RESTRICTION', 16977: 'MOSAIC_ADDRESS_RESTRICTION', 16978: 'SECRET_PROOF', 17220: 'NAMESPACE_METADATA', 17229: 'MOSAIC_SUPPLY_REVOCATION', 17230: 'MOSAIC_ALIAS', 17232: 'ACCOUNT_OPERATION_RESTRICTION'
 ```
 
-MessageType is as follows.
+Il tipo del messaggio è il seguente.
 ```js
 {0: 'PlainMessage', 1: 'EncryptedMessage', 254: 'PersistentHarvestingDelegationMessage', -1: 'RawMessage'}
 ```
-## 4.6 Aggregate Transactions
+## 4.6 Gruppo di transazioni
 
-Aggregate transactions can merge multiple transactions into one.
-Symbol’s public network supports aggregate transactions containing up to 100 inner transactions (involving up to 25 different cosignatories).
-The content covered in subsequent chapters includes functions that require an understanding of aggregate transactions.
-This chapter introduces only the simplest of aggregate transactions.
+Più transazioni si possono raggruppare in una che le contiene.  
+La rete blockchain pubblica Symbol, ammette che un gruppo di transazioni contenga fino a
+100 transazioni, ciascuna con un massimo di 25 cointestatari.
+Nei seguenti capitoli saranno mostrate funzionalità che prescrivono la comprensione del concetto
+di gruppo di transazioni.
+In questo capitolo introduciamo solo il caso più semplice di gruppo di transazioni.
 
-### A case only the signature of the originator is required
+### Caso della firma obbligatoria all'origine 
 
 ```js
 bob = sym.Account.generateNewAccount(networkType);
@@ -344,7 +369,7 @@ carol = sym.Account.generateNewAccount(networkType);
 
 innerTx1 = sym.TransferTransaction.create(
     undefined, //Deadline
-    bob.address,  //Destination of the transaction
+    bob.address,  //Destinatario
     [],
     sym.PlainMessage.create("tx1"),
     networkType
@@ -352,7 +377,7 @@ innerTx1 = sym.TransferTransaction.create(
 
 innerTx2 = sym.TransferTransaction.create(
     undefined, //Deadline
-    carol.address,  //Destination of the transaction
+    carol.address,  //Destinatario
     [],
     sym.PlainMessage.create("tx2"),
     networkType
@@ -361,8 +386,8 @@ innerTx2 = sym.TransferTransaction.create(
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
     [
-      innerTx1.toAggregate(alice.publicAccount), //Publickey of the sender account
-      innerTx2.toAggregate(alice.publicAccount)  //Publickey of the sender account
+      innerTx1.toAggregate(alice.publicAccount), //Chiave pubblica del mittente
+      innerTx2.toAggregate(alice.publicAccount)  //Chiave pubblica del mittente
     ],
     networkType,
     [],
@@ -372,32 +397,36 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-First, create the transactions to be included in the aggregate transaction.
-It is not necessary to specify a Deadline at this time.
-When listing, add toAggregate to the generated transaction and specify the publickey of the sender account.
-Note that the sender and signing accounts **do not always match**.
-This is because of the possibility of scenarios such as 'Alice signing the transaction that Bob sent', which will be explained in subsequent chapters.
-This is the most important concept in using transactions on the Symbol blockchain.
-The transactions in this chapter are sent and signed by Alice, so the signature on the aggregate bonded transaction also specifies Alice.
+Come primo passo, creare le transazioni da includere nel gruppo di transazioni.
+Non è necesserio dichiarare la scadenza in questa fase.
+Quando si crea la lista, valorizzare il campo `toAggregate` nella transazione
+di gruppo, con la chiave pubblica dell'Indirizzo del mittente.
+Notare che il mittente e il firmatario **possono non coincidere**, ciò dipende dal caso d'uso.
+Ad esempio il caso in cui, 'Alice firma una transazione che ha inviato Bob', verrà spiegato nei prossimi capitoli.
+Tale concetto è il più importante per utilizzare le transazioni nella blockchain Symbol.
+In questo capitolo le transazioni sono inviate e firmate da Alice, così anche la
+firma nella transazione di gruppo è quella di Alice.
 
-## 4.7 Tips for use
+## 4.7 Consigli pratici
 
-### Proof of existence
+### Prova di paternità (Proof of existence), marca temporale
 
-The chapter on Accounts described how to sign and verify data by account.
-Putting this data into a transaction that is confirmed on the blockchain makes it impossible to delete the fact that an account has proved the existence of certain data at a certain time.
-It can be considered to have the same meaning as the possession between interested parties of a time-stamped electronic signature.（Legal decisions are left to experts）
+Il capitolo sugli Indirizzi ha descritto come firmare e verificare i dati di un Indirizzo.
+Se tali dati ottengono la conferma di convalida con una transazione nella blockchain, 
+saranno impossibili da cancellare, quindi sarà impossibile negare che un Indirizzo
+ne abbia la paternità in quel momento, assolvendo al contempo la funzione di marca temporale del documento o dato.
+E' equivalente alla prova di paternità con marcatura temporale tra soggetti intestatari di firma digitale (firma eletrronica
+avanzata a chiavi asimmetriche).
+La blockchain registra/aggiorna i dati con le transazioni la cui esistenza è un fatto indelebile generato dall'Indirizzo.
+Esponiamo due casi d'uso di prova di esistenza certificada da transazione.
 
-The blockchain updates data such as transactions with the existence of this "indelible fact that the account has proved".
-And also the blockchain can be used as proof of knowledge of a fact that nobody should have known about yet.
-This section describes two patterns in which data whose existence has been proven can be put on a transaction.
 
+#### Output del metodo che calcola l'impronta digitale con valore hash (SHA256)
 
-#### Digital data hash value (SHA256) output method
+Si può provare l'esistenza di un file registrandone l'impronta digitale (digest) nella blockchain.
 
-The existence of a file can be proved by recording its digest value in the blockchain.
+Il calcolo del valore hash con il metodo SHA256 a seconda dal sistema operativo di origine, è il seguente.
 
-The calculation of the hash value using SHA256 for files in each operating system is as follows.
 ```sh
 #Windows
 certutil -hashfile WINfilepath SHA256
@@ -407,9 +436,11 @@ shasum -a 256 MACfilepath
 sha256sum Linuxfilepath
 ```
 
-#### Splitting large data
+#### Suddividere grandi moli di dati
 
-As the payload of a transaction can only contain 1023 bytes. Large data is split up and packed into the payload to make an aggregate transaction.
+Essendo il carico del messaggio di una transazione, limitato a 1023 Byte, 
+Una sequenza lunga di informazioni potrebbe essere suddivisa in più transazioni
+poi raggruppate in una sola.
 
 ```js
 bigdata = 'C00200000000000093B0B985101C1BDD1BC2BF30D72F35E34265B3F381ECA464733E147A4F0A6B9353547E2E08189EF37E50D271BEB5F09B81CE5816BB34A153D2268520AF630A0A0E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198414140770200000000002A769FB40000000076B455CFAE2CCDA9C282BF8556D3E9C9C0DE18B0CBE6660ACCF86EB54AC51B33B001000000000000DB000000000000000E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198544198205C1A4CE06C45B3A896B1B2360E03633B9F36BF7F22338B000000000000000066653465353435393833444430383935303645394533424446434235313637433046394232384135344536463032413837364535303734423641303337414643414233303344383841303630353343353345354235413835323835443639434132364235343233343032364244444331443133343139464435353438323930334242453038423832304100000000006800000000000000B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D000000000198444198205C1A4CE06C45B3A896B1B2360E03633B9F36BF7F2233BC089179EBBE01A81400140035383435344434373631364336433635373237396800000000000000B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D000000000198444198205C1A4CE06C45B3A896B1B2360E03633B9F36BF7F223345ECB996EDDB9BEB1400140035383435344434373631364336433635373237390000000000000000B2D4FD84B2B63A96AA37C35FC6E0A2341CEC1FD19C8FFC8D93CCCA2B028D1E9D5A71EBA9C924EFA146897BE6C9BB3DACEFA26A07D687AC4A83C9B03087640E2D1DDAE952E9DDBC33312E2C8D021B4CC0435852C0756B1EBD983FCE221A981D02';
