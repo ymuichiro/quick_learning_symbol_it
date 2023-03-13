@@ -1,60 +1,67 @@
-# 5. Mosaics
+# 5. Mosaic
 
-This chapter describes the Mosaic settings and how they are generated.
-In Symbol, a token is called as a Mosaic.
+Questo capitolo presenta le impostazioni Mosaic e come crearne.
+Nella blockchain Symbol, i token si chiamano Mosaic.
 
-> According to Wikipedia, Tokens are 'objects of various shapes made of clay with a diameter of around 1 cm, excavated from Mesopotamian strata from around 8000 BC to 3000 BC'. On the other hand, mosaic,  is "a technique of decorative art in which small pieces are assembled and embedded to form a picture (image) or pattern. Stone, ceramics (mosaic tiles), coloured and colourless glass, shells and wood are used to decorate the floors and walls of buildings or crafts.".
-In Symbol, mosaics can be thought of as the various components that represent aspects of the ecosystem created by the Symbol blockchain.
+> Per citare Wikipedia, i token sono 'oggetti di varie forme fatti di argilla con
+un diametro di circa 1 cm, da ritrovamenti che risalgono ad 8000 anni a.C. fino a 3000 anni d.C.,
+fatti negli scavi in Mesopotamia'. Per contro, un mosaico, è 'una tecnica decorativa artistica
+costituita da tessere accostate e disposte per formare un disegno o un motivo. Le tessere
+sono costituite di pietra e o ceramica colorata, vetro, conchiglie o legno ad adornare pavimenti e
+pareti di edifici".
+Nella blockchain Symbol, i Mosaic si possono pensare come tasselli che modellano il proprio ecosistema.
 
-## 5.1 Mosaic generation
+## 5.1 Generare un Mosaic
 
-For mosaic generation, define the mosaic to be created.
+Per generare un Mosaic, prima valorizzarne le proprietà caratteristiche.
 ```js
-supplyMutable = true; //Availability of supply changes
-transferable = false; //Transferability to third parties
-restrictable = true; //Availability of restriction settings
-revokable = true; //Revocability from the issuer
-//Mosaic definition
+supplyMutable = true; //Possibilità di modificare la quantità totale
+transferable = false; //Possibilità di trasferimento a terzi
+restrictable = true; //Limitazioni 
+revokable = true; //Revocabile su ordine dell'emittente
+//Definizione del Mosaic 
 nonce = sym.MosaicNonce.createRandom();
 mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     undefined, 
     nonce,
-    sym.MosaicId.createFromNonce(nonce, alice.address), //Mosaic ID
+    sym.MosaicId.createFromNonce(nonce, alice.address), //ID del Mosaic
     sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
-    2,//Divisibility:Divisibility
-    sym.UInt64.fromUint(0), //Duration:Effective date
+    2,//Fattore di scala (numero di cifre dopo la virgola): Divisibility
+    sym.UInt64.fromUint(0), //Periodo di validità: Effective date
     networkType
 );
 ```
 
-MosaicFlags are as follows.
+Il tipo `MosaicFlags` è come segue.
 
 ```js
 MosaicFlags {
   supplyMutable: false, transferable: false, restrictable: false, revokable: false
 }
 ```
-Permissions of supply changes, transferability to third parties, application of Mosaic Global Restrictions and revocability from the issuer can be specified.
-Once set these properties cannot be changed at a later date.
+Si possono dichiarare facoltà di modiche alla quantità iniziale totale emessa, trasferibilità verso terzi, restrizioni globali, revocabilità lato emittente.
+Questi valori non possono cambiare dopo la creazione dell'istanza Mosaic.
 
-#### Divisibility
+#### Fattore di scala: `divisibility`
 
-Divisibility determines to what number of decimal places the quantity can be measured. Data is held as integer values.
+Il fattore di scala consiste nel numero di cifre decimali della massa monetaria. E' un numero intero.
 
 divisibility:0 = 1  
 divisibility:1 = 1.0  
 divisibility:2 = 1.00  
 
-#### Duration
+Se si specifica 0, non potrà essere fratto.
 
-If specified as 0, it cannot be subdivided into smaller units.
-If a mosaic expiry date is set, the data will not disappear after the expiry date.
-Please note that you can own up to 1,000 mosaics per account.
+#### Periodo di validità: `duration`
+
+Se in un Mosaic è impostata la data di scadenza, il Mosaico non scomparirà
+prima di tale data.
+Un Indirizzo può contenere fino ad un massimo di 1.000 Mosaic.
 
 
-Next, change the quantity.
+Modifichiamo la quantità (numero di token).
 ```js
-//Mosaic change
+//Modifiche al Mosaic
 mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
     undefined,
     mosaicDefTx.mosaicId,
@@ -63,17 +70,15 @@ mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
     networkType
 );
 ```
-If supplyMutable:false, the quantity can only be changed if the entire supply of the mosaic is in the issuers account.
-If divisibility > 0, define it as an integer value with the smallest unit being 1.
-（Specify 100 if you want to create 1.00 with divisibility:2）
+Quando la proprietà `sypplyMutable` è valorizzata a `false`, il numero di token totali si può modificare solo se tutti i token sono rimasti fermi nell'Indirizzo emittente, ossia non vi è stata alcuna transazione di trasferimento, anche parziale, ad un altro Indirizzo.
+Se la proprietà `divisibility` è valorizzata con un numero maggiore di `0`, l'unità più piccola del token sarà 1. (Per es.: impostare `2` se si vuole che 100 token siano considerati come 1,00)
 
-MosaicSupplyChangeAction is as follows.
+`MosaicSupplyChangeAction` è definita come segue.
 ```js
 {0: 'Decrease', 1: 'Increase'}
 ```
-Specify Increase if you want to increase it.
-Merge two transactions above into an aggregate transaction.
-
+Specificare `Increase` se si vuole aumentare.
+Le due transazioni mostrate prima, vengono raggruppate in una sola.
 ```js
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
@@ -87,13 +92,12 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-Note that a feature of the aggregate transaction is that it attempts to change the quantity of a mosaic that does not yet exist.
-When arrayed, if there are no inconsistencies, they can be handled without problems within a single block.
+Notare che in questa transazione di gruppo si sta eseguendo la modifica della quantità di un Mosaic che ancora non esiste.
+Tuttavia la transazione avrà successo, a meno di inconsistenze sui valori delle proprietà del Mosaic, e verranno eseguite come fosse una operazione unica.
 
+### Conferma
 
-### Confirmation
-Confirm the mosaic information held by the account which created the mosaic.
-
+La conferma che le informazioni del Mosaico sono agganciate all'Indirizzo che l'ha creato.
 ```js
 mosaicRepo = repo.createMosaicRepository();
 accountInfo.mosaics.forEach(async mosaic => {
@@ -101,37 +105,37 @@ accountInfo.mosaics.forEach(async mosaic => {
   console.log(mosaicInfo);
 });
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > MosaicInfo {version: 1, recordId: '622988B12A6128903FC10496', id: MosaicId, supply: UInt64, startHeight: UInt64, …}
 > MosaicInfo
-    divisibility: 2 //Divisibility
-    duration: UInt64 {lower: 0, higher: 0} //Duration
+    divisibility: 2 //Fattore di scala: Divisibility
+    duration: UInt64 {lower: 0, higher: 0} //Periodo di validità: Duration
   > flags: MosaicFlags
-        restrictable: true //Availability of restriction settings
-        revokable: true //Revocability from the issuer
-        supplyMutable: true //Availability of supply changes
-        transferable: false //Transferability to third parties
+        restrictable: true //Possibilità di restrizioni
+        revokable: true //Revocabile dall'emittente
+        supplyMutable: true //Quantità totale modificabile
+        transferable: false //Trasferibilità a terzi
   > id: MosaicId
         id: Id {lower: 207493124, higher: 890137608} //MosaicID
     ownerAddress: Address {address: 'TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ', networkType: 152} //Issure address
     recordId: "62626E3C741381859AFAD4D5" 
-    supply: UInt64 {lower: 1000000, higher: 0} //Total supply
+    supply: UInt64 {lower: 1000000, higher: 0} //Quantità totale di monete
 ```
 
-## 5.2 Mosaic transfer
+## 5.2 Trasferire un Mosaic
 
-Transfer the created mosaic.
-Those new to blockchain often imagine mosaic transferring as "sending a mosaic stored on a client terminal to another client terminal", but mosaic information is always shared and synchronised across all nodes, and it is not about transferring mosaic information to the destination. 
-More precisely, it refers to the operation of recombining token balances between accounts by 'sending transactions' to the blockchain.
+Come trasferire un Mosaic che abbiamo creato.
+I neofiti della blockchain spesso immaginano un trasferimento di un Mosaic come un'operazione lato client, invece le informazioni del Mosaic sono sempre condivise e sincronizzate da tutti i nodi della rete, quindi non va pensata come un invio di dati al terminale del destinatario.
+Più precisamente, l'operazione di trasferimento consiste nel ricondurre i saldi dei rispettivi Mosaic negli Indirizzi, eseguendo una transazione inclusa nella blockchain. 
 
 ```js
-//Creating a receiving account
+//Creazione dell'Indirizzo ricevente
 bob = sym.Account.generateNewAccount(networkType);
 tx = sym.TransferTransaction.create(
     sym.Deadline.create(epochAdjustment),
-    bob.address,  //Destination address
-    // Transfer mosaic list
+    bob.address,  //Indirizzo del destinatario
+    // Lista di trasferimento di Mosaic 
     [ 
       new sym.Mosaic(
         new sym.MosaicId("3A8416DB2D53B6C8"), //TestnetXYM
@@ -149,27 +153,25 @@ signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
+##### Trasferire più di un Mosaic alla volta
 
+Si possono trasferire più di un Mosaic con un'unica transazione.
+Per trasferire il Mosaico di nome `XYM`,  valorizzare con il seguente ID di Mosaic.
 
-##### Transfer a list of mosaics
+- Rete blockchain pubblica Symbol detta Mainnet：6BED913FA20223F8
+- Rete blockchain pubblica di test detta Testnet：3A8416DB2D53B6C8
 
-Multiple mosaics can be transferred in a single transaction.
-To transfer XYM, specify the following mosaic ID.
+#### Quantità di monete 
+Il numero di cifre decimali sono indicate con numero intero.
+Essendo il fattore di scala di `XYM` pari a 6, si ha che per trasferire `1XYM` dobbiamo valorizzare a `1000000`.
 
-- Mainnet：6BED913FA20223F8
-- Testnet：3A8416DB2D53B6C8
-
-#### Amount
-All decimal points are also specified as integers.
-XYM is divisibility 6, so it is specified as 1XYM=1000000.
-
-### Confirmation of transaction
+### Conferma della transazione
 
 ```js
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo); 
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > TransferTransaction
     deadline: Deadline {adjustedValue: 12776690385}
@@ -198,53 +200,52 @@ console.log(txInfo);
     type: 16724
     version: 1
 ```
-It can be seen that two types of mosaics have been transferred in the Mosaic of the TransferTransaction. You can also find information on the approved blocks in the TransactionInfo.
+Vediamo al campo `Mosaic` della transazione di trasferimento che due tipi di Mosaic sono stati trasferiti, inoltre si possono anche vedere l'altezza del blocco di approvazione al campo `TransactionInfo`.
 
-## 5.3 Tips for use
+## 5.3 Consigli Pratici
 
-### Proof of existence
+### Prova di esistenza (Proof of existence)
 
-Proof of existence by transaction was explained in the previous chapter.
-The transferring instructions created by an account can be left as an indelible record, so that a ledger can be created that is absolutely consistent.
-As a result of the accumulation of 'absolute, indelible transaction instructions' for all accounts, each account can prove its own mosaic ownership.
-As a result of the accumulation of 'indelible transaction instructions' for all accounts, each account can prove its own mosaic ownership.
-(In this document, possession is defined as "the state of being able to give it up at will". Slightly off topic, but the meaning of 'state of being able to give it up at will' may make sense if you look at the fact that ownership is not legally recognised for digital data, at least in Japan yet, and that once you know the data, you cannot prove to others that you have forgotten it of your own will. The blockchain allows you to clearly indicate the relinquishment of that data, but I'll leave the details to the legal experts.)
+La prova di esistenza indotta da una transazione è stata spiegata nel capitolo precedente.
+La traccia lasciata dal trasferimento eseguito con una transazione originata da un Indirizzo ne è la prova, e possiamo raccoglierla per ricostruire un registro consistente.
+Procedendo in modo incrementale con l'elenco delle transazioni, le quali rappresentano istruzioni indelebili, ogni Indirizzo può provare il possesso dei propri Mosaic.
+(In questo documento, di definisce possesso "la capacità di poterlo mandare volontariamente". Potrebbe sembrare fuoritema, ma vale la pena considerare che la proprietà dei dati digitali è una questione aperta, tanto quanto la prova della volontà di oblio. La blockchain permette al singolo di indicare tale volontà, i cui dettagli andrebbero approfonditi con un esperto legale.
 
 #### NFT (non fungible token)
 
-By limiting the number of tokens total supply to 1 and setting supplyMutable to false, only one token can be issued and no more can ever exist.
+Il limite sul numero di token, se impostato a 1  quale quantità iniziale assieme alla proprietà `supplyMNutable` valorizzata a `false`, da' origine ad un solo token esistente di numero, non uno di più, per sempre fino alla eventuale scadenza del periodo di validità.
 
-Mosaics store information about the account address that issued the mosaic and this data cannot be tampered with. Therefore, transactions from the account that issued the mosaic can be treated as metadata.
+I Mosaic memorizzano informazioni sull'Indirizzo di creazione e questa associazione è irreversibile a chiunque. Quindi le transazioni da un Indirizzo di emissione di un Mosaic si possono considerare metadati.
 
-Note that there is also a way to register metadata to the mosaic, described in Chapter 7, which can be updated by the multi signature of the registered account and the mosaic issuer.
+Notare che è possibile registrare dei metadati nel Mosaic, come descritto al capitolo 7, per mezzo della firma multipla dei cointestatari e dell'emittente.
 
-There are many ways to create NFTs, an example of the process is given below (please set the nonce and flag information appropriately for execution).
+Ci sono molti modi di creare NFT, uno di questi viene descritto qui sotto (si faccia attenzione ad impostare il `nonce` e il flag in modo appropriato all'uso).
 ```js
-supplyMutable = false; //Availability of supply changes
-//Mosaic definition
+supplyMutable = false; //Possibilità di modifica della quantità totale
+//Definizione del Mosaic 
 mosaicDefTx = sym.MosaicDefinitionTransaction.create(
     undefined, nonce,mosaicId,
     sym.MosaicFlags.create(supplyMutable, transferable, restrictable, revokable),
-    0,//Divisibility:Divisibility
-    sym.UInt64.fromUint(0), //Duration:Indefinite
+    0,//Fattore di scala: Divisibility
+    sym.UInt64.fromUint(0), //Periodo di validità: Indefinite
     networkType
 );
-//Fixed mosaic quantity
+//La quantità totale del Mosaico è costante
 mosaicChangeTx = sym.MosaicSupplyChangeTransaction.create(
     undefined,mosaicId,
-    sym.MosaicSupplyChangeAction.Increase, //Increase
-    sym.UInt64.fromUint(1), //Amount1
+    sym.MosaicSupplyChangeAction.Increase, //Aumentare
+    sym.UInt64.fromUint(1), //Quantità unitaria (un solo token)
     networkType
 );
 //NFTdata
 nftTx  = sym.TransferTransaction.create(
-    undefined, //Deadline:Duration
+    undefined, //Periodo di validità: Duration
     alice.address, 
     [],
     sym.PlainMessage.create("Hello Symbol!"), //NFTdata
     networkType
 )
-//Generating mosaic and aggregating NFT data and registering them in blocks.
+//Generazione del Mosaic e incapsulazione dei dati NFT per la registrazione nel blocco.
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
     [
@@ -256,20 +257,18 @@ aggregateTx = sym.AggregateTransaction.createComplete(
 ).setMaxFeeForAggregate(100, 0);
 ```
 
-The block height and creation account at the time of mosaic generation are included in the mosaic information, so by searching for transactions in the same block, the NFT data associated with the mosaic can be retrieved.
-The NFT data associated with the transactions in the same block can be retrieved.
+Tra i dati del Mosaic verranno registrati anche l'altezza del blocco e l'Indirizzo di creazione al momento di generazione, per abilitare la ricerca dei dati NFT all'interno dello stesso blocco. 
 
 
 ##### Note
-In case that the creator of the mosaic owns the entire quantity, the total supply can be changed.
-If the data is split into transactions and recorded, it cannot be tampered with, but data can be appended.
-When managing an NFT, please take care to manage it appropriately, for example by strictly managing or discarding the mosaic creator's private key.
+Quando il creatore del Mosaic possiede la totalità dei token, egli può compiere variazioni sulla quantità tottale.
+I dati da registrare si possono suddividere in più transazioni in modo irrevocabile ed incrementale.
+Un NFT va gestito in modo appropriato e con cura, considerandone con attenzione la conservazione o l'eliminazione della chiave privata. 
 
+#### Operazioni a servizio revocabile 
 
-#### Revocable point service operations.
-
-Setting transferable to false restricts resale, making it possible to define points that are less susceptible to the act on settlement laws or regulations.
-Setting revokable to true enables centrally managed point service operations where the user does not need to manage the private key to collect the amount used.
+Impostare il valore `false` nella proprietà di trasferimento a terzi, ne impedisce la rivendita.
+Impostare il valore `true` consente ad un fornitore di servizi di evitare che l'utente debba incaricarsi di gestire la chiave privata per impossessarsi del token.
 
 ```js
 transferable = false; //Transferability to third parties
