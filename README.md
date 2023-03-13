@@ -39,9 +39,9 @@ con l'aiuto della comunità giapponese
 
 ### [5.Mosaic](./05_mosaic.md)
 
-- [5.1 Generare un Mosaic](05_mosaic.md#51-Generare un Mosaic)
-- [5.2 Trasferire un Mosaic](05_mosaic.md#52-Trasferire un Mosaic)
-- [5.3 Consigli pratici](05_mosaic.md#53-Consigli pratici)
+- [5.1 Generare un Mosaic](05_mosaic.md#51-generare-un-mosaic)
+- [5.2 Trasferire un Mosaic](05_mosaic.md#52-Trasferire-un-mosaic)
+- [5.3 Consigli pratici](05_mosaic.md#53-consigli-pratici)
 
 ### [6.Sinonimi](./06_namespace.md)
 
