@@ -36,17 +36,17 @@ con l'aiuto della comunità giapponese
 ### [5.Mosaic](./05_mosaic.md)
 
 - [5.1 Generare un Mosaic](05_mosaic.md#51-generare-un-mosaic)
-- [5.2 Trasferire un Mosaic](05_mosaic.md#52-Trasferire-un-mosaic)
+- [5.2 Trasferire un Mosaic](05_mosaic.md#52-trasferire-un-mosaic)
 - [5.3 Consigli pratici](05_mosaic.md#53-consigli-pratici)
 
 ### [6.Sinonimi](./06_namespace.md)
 
-- [6.1 Calcolo delle commissioni](06_namespace.md#61-Calcolo delle commissioni)
-- [6.2 Richiesta di affitto](06_namespace.md#62-Richiesta di affitto)
-- [6.3 Richiesta di Link](06_namespace.md#63-Richiesta di Link)
-- [6.4 Richiesta di Link formale](06_namespace.md#64-Richiesta di Link formale)
-- [6.5 Riferimento](06_namespace.md#65-Riferimento)
-- [6.6 Consigli pratici](06_namespace.md#66-Consigli pratici)
+- [6.1 Calcolo delle commissioni](06_namespace.md#61-calcolo-delle-commissioni)
+- [6.2 Affitto](06_namespace.md#62-affitto)
+- [6.3 Link](06_namespace.md#63-link)
+- [6.4 Richiesta di Link formale](06_namespace.md#64-richiesta-di-link-formale)
+- [6.5 Riferimenti al Sinonimo](06_namespace.md#65-riferimenti-al-sinonimo)
+- [6.6 Consigli pratici](06_namespace.md#66-consigli-pratici)
 
 ### [7.Metadati](./07_metadata.md)
 

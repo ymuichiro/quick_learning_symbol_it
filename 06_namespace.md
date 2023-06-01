@@ -84,7 +84,6 @@ subNamespaceTx = sym.NamespaceRegistrationTransaction.createSubNamespace(
 )
 ```
 
-
 ### Calcolo della data di scadenza
 
 Calcolo della data di scadenza di un Sinonimo in affitto.
@@ -148,7 +147,7 @@ await txRepo.announce(signedTx).toPromise();
 Un Mosaic è collegabile con il Sinonimo esclusivamente all'Indirizzo di creazione del Mosaic.
 
 
-## 6.4 Utilizzo di  `UnresolvedAccount`
+## 6.4 Richiesta di Link formale
 
 Impostare l'Indirizzo di destinazione in modalità `UnresolvedAccount` firmando
 una transazione da propagare senza specificare l'Indirizzo.
