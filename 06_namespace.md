@@ -1,14 +1,15 @@
-# 6. Namespaces
+# 6. Sinonimi
 
-Namespaces are human-readable text strings that can be rented and linked with an address or a mosaic.
-The name has a maximum length of 64 characters (the only allowed characters are `a` through `z`, `0` through `9`, `_` and `-`).
+I Sinonimi sono stringhe di testo leggibili, acquisite in affitto, associate ad un Indirizzo o un Mosaic.
+Il nome ha una lunghezza massima di 64 caratteri, sono ammesse solo le lettere dalla `a` alla `z`, le cifre da `0` a `9`, il carattere di sottolineato `_` e il trattino `-`.
 
-## 6.1 Fee calculation
+## 6.1 Calcolo delle commissioni
 
-There is a rental fee associated with registering a namespace which is separate from the network fee.
-Rental fees fluctuate depending on network activity with costs increasing during busy network periods, therefore it is sensible to check fees before registering a namespace.
+Per la registrazione di un Sinonimo va versata una commissione di affitto oltre alla commissione di rete.
+Le commissioni di affitto variano proporzionalmente all'utilizzo, il costo cresce con l'aumentare del traffico di rete,
+pertanto si consiglia controllarne l'ammontare prima dell'esecuzione.
 
-In the following example, the fees are calculated for a 365-day rental of a root namespace.
+Nel seguente esempio, le commissioni sono calcolate per un periodo di affitto di 365 giorni e Sinonimo di primo livello.
 
 
 ```js
@@ -22,31 +23,32 @@ rootNsRenatalFeeTotal = rentalBlock * rootNsperBlock;
 console.log("rentalBlock:" + rentalBlock);
 console.log("rootNsRenatalFeeTotal:" + rootNsRenatalFeeTotal);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > rentalBlock:1051200
 > rootNsRenatalFeeTotal:210240000 //Approximately 210XYM
 ```
 
-The duration is specified by the number of blocks; one block is calculated as 30 seconds.
-There is a minimum rental period of 30 days (maximum 1825 days).
+L'intervallo di tempo è misurato in numero di blocchi; un blocco conta per 30 secondi.
+Il periodo minimo di affitto è limitato inferiormente a 30 giorni, il periodo massimo di affitto è di 1825 giorni. 
 
-Calculate the fee for acquiring a sub namespace.
+A seguire viene calcolata la commissione per affittare un Sinonimo di secondo livello.
 
 ```js
 childNamespaceRentalFee = rentalFees.effectiveChildNamespaceRentalFee.compact()
 console.log(childNamespaceRentalFee);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > 10000000 //10XYM
 ```
 
-There is no duration limit specified for the sub namespace. It can be used for as long as the root namespace is registered.
+I Sinonimi di secondo livello non sono vincolati ad un intervallo di durata, la loro
+esistenza dipende dalla durata del relativo Sinonimo di primo livello.
 
-## 6.2 Rental
+## 6.2 Affitto
 
-Rent a root namespace.(Example:xembook)
+Affitto di un Sinonimo di primo livello il cui nome è per esempio:`xembook`
 ```js
 
 tx = sym.NamespaceRegistrationTransaction.createRootNamespace(
@@ -59,7 +61,7 @@ signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-Rent a sub namespace.(Example:xembook.tomato)
+Affitto di un Sinonimo di secondo livello (per esempio:`xembook.tomato`)
 ```js
 subNamespaceTx = sym.NamespaceRegistrationTransaction.createSubNamespace(
     sym.Deadline.create(epochAdjustment),
@@ -71,7 +73,7 @@ signedTx = alice.sign(subNamespaceTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-You can also create a tier 2 sub namespace, for example in this case, defining xembook.tomato.morning:
+Si possono creare ulteriori sottolivelli del Sinonimo dato, per esempio `xembook.tomato.morning`:
 
 ```js
 subNamespaceTx = sym.NamespaceRegistrationTransaction.createSubNamespace(
@@ -83,9 +85,9 @@ subNamespaceTx = sym.NamespaceRegistrationTransaction.createSubNamespace(
 ```
 
 
-### Calculation of expiry date
+### Calcolo della data di scadenza
 
-Calculates the expiry date of the rented root namespace.
+Calcolo della data di scadenza di un Sinonimo in affitto.
 
 ```js
 nsRepo = repo.createNamespaceRepository();
@@ -102,17 +104,17 @@ endDate = new Date(lastBlock.timestamp.compact() + remainHeight * 30000 + epochA
 console.log(endDate);
 ```
 
-Retrieve information about the namespace expiry and output the date and time of the remaining number of blocks subtracted from the current block height multiplied by 30 seconds (the average block generation interval).
-For testnet, the update deadline is postponed by about a day from the expiry date. And for the mainnet, this value is 30 days, please note it.
+ecuperando la data di scadenza del Sinonimo si calcola la differenza tra il numero di blocchi a scadenza e 
+il blocco corrente (block height della blockchain), moltiplicandolo per 30 secondi (tempo medio di un blocco).
+Si prega di notare che per la rete di test (testnet), la scadenza è differita di un giorno.
 
-
-###### Sample output
+###### Output esemplificativo
 ```js
 > Tue Mar 29 2022 18:17:06 GMT+0900 (JST)
 ```
 ## 6.3 Link
 
-### Link to an account
+### Collegare un Indirizzo
 ```js
 namespaceId = new sym.NamespaceId("xembook");
 address = sym.Address.createFromRawAddress("TBIL6D6RURP45YQRWV6Q7YVWIIPLQGLZQFHWFEQ");
@@ -126,9 +128,9 @@ tx = sym.AliasTransaction.createForAddress(
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
-The linked address does not have to be owned by you.
+Per collegare un Indirizzo, non è necessario esserne i proprietari.
 
-### Link to a mosaic
+### Collegare un Mosaic
 ```js
 namespaceId = new sym.NamespaceId("xembook.tomato");
 mosaicId = new sym.MosaicId("3A8416DB2D53xxxx");
@@ -143,18 +145,19 @@ signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-Mosaics can only be linked if it is identical to the address at which the mosaic was created.
+Un Mosaic è collegabile con il Sinonimo esclusivamente all'Indirizzo di creazione del Mosaic.
 
 
-## 6.4 Use as an UnresolvedAccount
+## 6.4 Utilizzo di  `UnresolvedAccount`
 
-Designate the destination as UnresolvedAccount to sign and announce the transaction without identifying the address.
-Transaction is executed for an account resolved on the chain side.
+Impostare l'Indirizzo di destinazione in modalità `UnresolvedAccount` firmando
+una transazione da propagare senza specificare l'Indirizzo.
+La transazione verrà eseguita per l'Indirizzo determinato lato blockchain.
 ```js
 namespaceId = new sym.NamespaceId("xembook");
 tx = sym.TransferTransaction.create(
     sym.Deadline.create(epochAdjustment),
-    namespaceId, //Unresolved Account:Unresolved Account Address
+    namespaceId, //Unresolved Account: Indirizzo non specificato
     [],
     sym.EmptyMessage,
     networkType
@@ -162,7 +165,7 @@ tx = sym.TransferTransaction.create(
 signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
-Designate the sending mosaic as an UnresolvedMosaic to sign and announce the transaction without identifying the mosaic ID.
+Impostare il Mosaic come `UnresolvedMosaic` in una transazione firmata da propagare.
 
 ```js
 namespaceId = new sym.NamespaceId("xembook.tomato");
@@ -171,8 +174,8 @@ tx = sym.TransferTransaction.create(
     address, 
     [
         new sym.Mosaic(
-          namespaceId,//Unresolved Mosaic:Unresolved Mosaic
-          sym.UInt64.fromUint(1) //Amount
+          namespaceId,//Unresolved Mosaic:Mosaic non specificato
+          sym.UInt64.fromUint(1) //Quantità
         )
     ],
     sym.EmptyMessage,
@@ -182,7 +185,7 @@ signedTx = alice.sign(tx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-To use XYM in a namespace, specify as follows.
+Se si vogliono utilizzare monete XYM, nel campo `namespace`, specificare quanto segue:
 
 ```js
 namespaceId = new sym.NamespaceId("symbol.xym");
@@ -193,18 +196,18 @@ namespaceId = new sym.NamespaceId("symbol.xym");
     id: Id {lower: 1106554862, higher: 3880491450}
 ```
 
-Id is held internally as a number `{lower: 1106554862, higher: 3880491450}` called Uint64.
+il valore del campo `Id` è mappato internamente come numero `{lower: 1106554862, higher: 3880491450}` di tipo `Uint64`.
 
-## 6.5 Reference
+## 6.5 Riferimenti al Sinonimo
 
-Refer to the namespace linked to the address.
+Per ottenere il riferimento al Sinonimo associato all'Indirizzo.
 ```js
 nsRepo = repo.createNamespaceRepository();
 
 namespaceInfo = await nsRepo.getNamespace(new sym.NamespaceId("xembook")).toPromise();
 console.log(namespaceInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 NamespaceInfo
     active: true
@@ -222,24 +225,24 @@ NamespaceInfo
     startHeight: UInt64 {lower: 324865, higher: 0}
 ```
 
-AliasType is as follows.
+`AliasType` è definito come segue:
 ```js
 {0: 'None', 1: 'Mosaic', 2: 'Address'}
 ```
 
-NamespaceRegistrationType is as follows.
+`NamespaceRegistrationType` è definito come segue:
 ```js
 {0: 'RootNamespace', 1: 'SubNamespace'}
 ```
 
-Refer to the namespace linked to the mosaic.
+Per ottenere il riferimento al Sinonimo collegato al Mosaic:
 ```js
 nsRepo = repo.createNamespaceRepository();
 
 namespaceInfo = await nsRepo.getNamespace(new sym.NamespaceId("xembook.tomato")).toPromise();
 console.log(namespaceInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 NamespaceInfo
   > active: true
@@ -258,9 +261,9 @@ NamespaceInfo
     startHeight: UInt64 {lower: 324865, higher: 0}
 ```
 
-### Reverse lookup
+### Ricerca inversa 
 
-Check all namespaces linked to the address.
+Recuperare tutti i Sinonimi collegati ad un Indirizzo:
 ```js
 nsRepo = repo.createNamespaceRepository();
 
@@ -274,7 +277,7 @@ namespaceIds = accountNames[0].names.map(name=>{
 console.log(namespaceIds);
 ```
 
-Check all namespaces linked to the mosaic.
+Recuperare tutti i Sinonimi collegati ad un Mosaic:
 ```js
 nsRepo = repo.createNamespaceRepository();
 
@@ -289,15 +292,15 @@ console.log(namespaceIds);
 ```
 
 
-### Receipt reference
+### Ricevuta di associazione dalla blockchain 
 
-Check how the blockchain has resolved the namespace used for the transaction.
-
+Per verificare il tipo di associazione calcolato dalla blockchain, cioè se il Sinonimo
+è stato associato ad un Indirizzo oppure ad un Mosaic
 ```js
 receiptRepo = repo.createReceiptRepository();
 state = await receiptRepo.searchAddressResolutionStatements({height:179401}).toPromise();
 ```
-###### Sample output
+###### Output Esemplificativo
 ```js
 data: Array(1)
   0: ResolutionStatement
@@ -311,28 +314,32 @@ data: Array(1)
       id: Id {lower: 646738821, higher: 2754876907}
 ```
 
-ResolutionType is as follows.
+`ResolutionType` è definito come segue:
 ```js
 {0: 'Address', 1: 'Mosaic'}
 ```
 
 #### Note
-As the namespace itself is rented, the link to the namespace used in past transactions may differ from the link to the current namespace.
+Il Sinonimo, essendo concesso in affitto, potrebbe essere già stato associato (linked) da transazioni eseguite
+precedentemente, quindi bisogna sempre verificare la ricevuta della blockchain per accertarsi
+dell'Indirizzo o Mosaico collegato in un dato momento. Per es. nella consultazione di dati storici.
 
-Always refer to your receipt if you want to know which account you were linked to at the time, e.g. when referring to historical data.
+## 6.6 Consigli pratici
 
+### Associazioni equivalenti con nomi di dominio esterni alla blockchain
 
-## 6.6 Tips for use
+Per definizione, il protocollo della blockchain non ammette l'esistenza di Sinonimi omonimi,
+cioè non è possibile registrare un Sinonimo con lo stesso nome di uno già registrato nella blockchain.
+Ciò permette agli utenti della blockchain di sviluppare un collegamento ad un marchio con un Indirizzo blockchain,
+il cui Sinonimo ha lo stesso nome di un dominio Internet o un marchio registrato, avendo la garanzia
+che l'associazione tra blockchain e mondo esterno (sito Internet, documento, opera d'arte, oggetto), rimarrà univoca
+per tutta la durata dell'affitto del Sinonimo.
+(Si consiglia di consultare un legale per i dettagli)
+Fare attenzione all'affidabilità e sicurezza dei domini esterni, ed assicurarsi di rinnovare il Sinonimo in base
+alle proprie necessità.
 
-### Reciprocal links with external domains
-
-As duplicate namespaces are restricted by protocol, user can build the brand valuation of one's account on the Symbol by acquiring a namespace that is identical to an internet domain or a well-known trademark name in the real world, and by promoting recognition of the namespace from external sources like official websites, printed materials, etc.
-(For legal validity, please seek expert opinion.)
-Beware of hacking external domains and renewing your own Symbol namespaces duration.
-
-
-#### Note on accounts acquiring a namespace
-Namespaces are rented for a specified duration .
-At the moment, options for acquired namespaces are only abandonment or duration extension.
-In case of utilising a namespace in a system where operational transfers, etc. are considered, we recommend acquiring a namespace with a multisig account (Chapter 9).
-
+#### Note sugli Indirizzi che on accounts acquiring a namespace
+I Sinonimi sono in affitto a scadenza. L'implementazione per ora comprende solo due casi,
+la scadenza per mancato rinnovo e il rinnovo.
+Qualora si desiderasse utilizzare un Sinonimo in un sistema con trasferimenti di proprietà, si
+consiglia di registrare il Sinonimo mediante Indirizzi cointestati (Capitolo 9).
