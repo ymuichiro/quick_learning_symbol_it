@@ -6,10 +6,6 @@
 
 ### XEMBook, quasarblue
 
-## Altri linguaggi
-[English](https://learn.en.symbol-community.com)
-[Japanese](https://learn.ja.symbol-community.com)
-
 ## Prefazione
 Questa traduzione è a beneficio di tutti i lettori italiani
 con l'aiuto della comunità giapponese 
