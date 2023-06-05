@@ -337,7 +337,7 @@ per tutta la durata dell'affitto del Sinonimo.
 Fare attenzione all'affidabilità e sicurezza dei domini esterni, ed assicurarsi di rinnovare il Sinonimo in base
 alle proprie necessità.
 
-#### Note sugli Indirizzi che on accounts acquiring a namespace
+#### Note sugli Indirizzi che utilizzano i Sinonimi 
 I Sinonimi sono in affitto a scadenza. L'implementazione per ora comprende solo due casi,
 la scadenza per mancato rinnovo e il rinnovo.
 Qualora si desiderasse utilizzare un Sinonimo in un sistema con trasferimenti di proprietà, si
