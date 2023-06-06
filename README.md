@@ -50,11 +50,11 @@ con l'aiuto della comunità giapponese
 
 ### [7.Metadati](./07_metadata.md)
 
-- [7.1 Registrare un Indirizzo](07_metadata.md#71-Registrare un Indirizzo)
-- [7.2 Registrare un Mosaic](07_metadata.md#72-Registrare un Mosaic)
-- [7.3 Registrare un Sinonimo](07_metadata.md#73-Registrare un Sinonimo)
-- [7.4 Conferma di esecuzione](07_metadata.md#74-Conferma di esecuzione)
-- [7.5 Consigli pratici](07_metadata.md#75-Consigli pratici)
+- [7.1 Registrare un Indirizzo](07_metadata.md#71-memorizzazione-nellindirizzo)
+- [7.2 Registrare un Mosaic](07_metadata.md#72-memorizzazione-nel-mosaic)
+- [7.3 Registrare un Sinonimo](07_metadata.md#73-memorizzazione-nel-sinonimo)
+- [7.4 Conferma di esecuzione](07_metadata.md#74-convalida)
+- [7.5 Consigli pratici](07_metadata.md#75-consigli-[[Opratici)
 
 ### [8.Lock](./08_lock.md)
 
