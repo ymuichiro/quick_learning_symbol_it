@@ -1,17 +1,19 @@
-# 7.Metadata
+# 7.Metadati
 
-Key-Value format data can be registered for an account mosaic namespace. The maximum value of data that can be written is 1024 bytes.
-We make the assumption that both mosaic, namespace and account are created by Alice in this chapter.
+E' possibile memorizzare dati di tipo coppia chiave-valore per ogni Sinonimo associato ad un Indirizzo o Mosaic,
+con una dimensione massima di 1024 byte per il valore.
+In questo capitolo assumiamo che il Sinonimo, in entrambi i casi in cui sia associato all'Indirizzo oppure al Mosaic, venga
+creato da Alice.
 
-Before running the sample scripts in this chapter, please load the following libraries:
+Prima di eseguire gli script di esempio, è necessario caricare le seguenti librerie:
 ```js
 metaRepo = repo.createMetadataRepository();
 mosaicRepo = repo.createMosaicRepository();
 metaService = new sym.MetadataTransactionService(metaRepo);
 ```
-## 7.1 Register for account
+## 7.1 Memorizzazione nell'Indirizzo
 
-Register a Key-Value for the account.
+Memorizzazione di una coppia chiave-valore nell'Indirizzo.
 
 ```js
 key = sym.KeyGenerator.generateUInt64Key("key_account");
@@ -20,9 +22,9 @@ value = "test";
 tx = await metaService.createAccountMetadataTransaction(
     undefined,
     networkType,
-    alice.address, //Metadata registration destination address
-    key,value, //Key-Value
-    alice.address //Metadata creator address
+    alice.address, //Indirizzo su cui si vogliono memorizzare i Metadati
+    key,value, //coppia chiave-valore
+    alice.address //Indirizzo del proprietario dei Metadati
 ).toPromise();
 
 aggregateTx = sym.AggregateTransaction.createComplete(
@@ -35,38 +37,40 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-Registration of metadata requires a signature of the account to which it is recorded.
-Even if the registration destination account and the sender account are the same, an aggregate transaction is required.
+Per memorizzare i Metadati è richiesta la firma dell'Indirizzo in cui vengono registrati.
+E' necessario eseguire una transazione di gruppo (detta aggregata) in ogni caso, compreso
+il caso in cui l'Indirizzo di destinazione e l'Indirizzo mittente coincidono.
 
-When registering metadata to different accounts, use "signTransactionWithCosignatories" to sign it.
+Se si memorizzano Metadati su più Indirizzi, usare il metodo `signTransactionWithCosignatories` per l'operazione di firma.
 
 ```js
 tx = await metaService.createAccountMetadataTransaction(
     undefined,
     networkType,
-    bob.address, //Metadata registration destination address
-    key,value, //Key-Value
-    alice.address //Metadata creator address
+    bob.address, //Indirizzo di destinazione della memorizzazione dei Metadati
+    key,value, //Coppia chiave-valore
+    alice.address //Indirizzo di chi sta creando i Metadati
 ).toPromise();
 
 aggregateTx = sym.AggregateTransaction.createComplete(
   sym.Deadline.create(epochAdjustment),
   [tx.toAggregate(alice.publicAccount)],
   networkType,[]
-).setMaxFeeForAggregate(100, 1); // Number of co-signer to second argument: 1
+).setMaxFeeForAggregate(100, 1); // Il numero di cofirmatari nel secondo argomento: 1
 
 signedTx = aggregateTx.signTransactionWithCosignatories(
-  alice,[bob],generationHash,// Co-signer to second argument
+  alice,[bob],generationHash,// Specificare il cofirmatario nel secondo argomento
 );
 await txRepo.announce(signedTx).toPromise();
 ```
 
-In case you don't know Bob's private key, Aggregate Bonded Transactions which are explained in the chapters that follow or offline signing must be used.
+Se non si conosce la chiave privata di Bob, al posto della Transazione Aggregata, eseguire una
+Transazione Aggregata Legata che verrà descritta nei capitoli seguenti, oppure ricorrere alla Firma a Freddo.
 
-## 7.2 Register to a mosaic
+## 7.2 Memorizzazione nel Mosaic
 
-Register a value with the composite key of the key value/source account for the target mosaic.
-The signature of the account that created the mosaic is required for registering and updating metadata.
+Per memorizzare una coppia chiave valore nel Mosaic con il rispettivo l'Indirizzo di creazione.
+E' necessario firmare la Transazione per memorizzare i dati, con l'Indirizzo con cui è stato creato il Mosaic.
 
 ```js
 mosaicId = new sym.MosaicId("1275B0B7511D9161");
@@ -78,9 +82,9 @@ value = 'test';
 tx = await metaService.createMosaicMetadataTransaction(
   undefined,
   networkType,
-  mosaicInfo.ownerAddress, //Mosaic creator address
+  mosaicInfo.ownerAddress, //Indirizzo con cui è stato creato il Mosaic
   mosaicId,
-  key,value, //Key-Value
+  key,value, //coppia chiave valore
   alice.address
 ).toPromise();
 
@@ -94,10 +98,10 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 7.3 Register for namespace
+## 7.3 Memorizzazione nel Sinonimo
 
-Register a Key-Value for the namespace.
-The signature of the account that created the mosaic is required for registering and updating metadata.
+Per memorizzare la coppia chiave valore nel Sinonimo.
+La firma della Transazione che registra i dati va eseguita con l'Indirizzo con cui è stato creato il Sinonimo.
 
 ```js
 nsRepo = repo.createNamespaceRepository();
@@ -109,10 +113,10 @@ value = 'test';
 
 tx = await metaService.createNamespaceMetadataTransaction(
     undefined,networkType,
-    namespaceInfo.ownerAddress, //Namespace creator address
+    namespaceInfo.ownerAddress, //Indirizzo con cui è stato creato il Sinonimo
     namespaceId,
-    key,value, //Key-Value
-    alice.address //Metadata registrant
+    key,value, //coppia chiave valore
+    alice.address //Indirizzo del regisrante
 ).toPromise();
 
 aggregateTx = sym.AggregateTransaction.createComplete(
@@ -125,8 +129,9 @@ signedTx = alice.sign(aggregateTx,generationHash);
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 7.4 Confirmation
-Check the registered metadata.
+## 7.4 Convalida
+
+Per verificare che i metadati siano stati registrati.
 
 ```js
 res = await metaRepo.search({
@@ -135,7 +140,7 @@ res = await metaRepo.search({
 ).toPromise();
 console.log(res);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 data: Array(3)
   0: Metadata
@@ -171,26 +176,28 @@ data: Array(3)
       id: Id {lower: 646738821, higher: 2754876907}
       value: "test"
 ```
-The metadataType is as follows.
+Segue la definizione del tipo `metadataType`:
 ```js
 sym.MetadataType
 {0: 'Account', 1: 'Mosaic', 2: 'Namespace'}
 ```
 
 ### Note
-While metadata has the advantage of providing quick access to information by Key-Value, it should be noted that it needs updating.
-Updating requires the signatures of the issuer account and the account to which it is registered, so it should only be used if both accounts can be trusted.
+Nonostante la comodità che deriva dall'utilizzo semplice e veloce di informazioni di tipo coppia chiave valore,
+si rammenta  l'operazione richiede la registrazione nella blockchain. Ciò comporta la firma dell'operazione con l'Indirizzo
+del registrante oltre alla firma fatta con l'Indirizzo di destinazione, in cui verrà registrata la coppia chiave valore.
+Di conseguenza, gli Indirizzi che si utilizzano devono essere di fiducia.
 
 
-## 7.5 Tips for use
+## 7.5 Consigli pratici
 
-### Proof of eligibility
+### Certificazione di accreditamento (proof of eligibility)
 
-We described proof of ownership in the Mosaic chapter and domain linking in the Namespace chapter.
-By receiving metadata issued by an account linked from a reliable domain can be used for proofing of ownership of eligibility within that domain.
+Si tratta della prova di appartenenza, con riferimento a quanto descritta nel capitolo dedicato ai Mosaic, di un nome di dominio collegato ad un Sinonimo.
+Registrando dei metadati per mezzo di un Indirizzo associato ad un nome di dominio, si può certificare l'accreditamento dell'Indirizzo a rappresentare il dominio.
 
 #### DID (Decentralized identity)
 
-The ecosystem is divided into issuers, owners and verifiers, e.g. students own the diplomas issued by universities, and companies verify the certificates presented by the students based on the public keys published by the universities.
-There is no platform-dependent or third party-dependent information required for this verification.
-By utilising metadata in this way, universities can issue metadata to accounts owned by students, and companies can verify the proof of graduation listed in the metadata with the university's public key and the student's mosaic (account) proof of ownership.
+Un sistema che impiega i DID, può essere suddiviso nei ruoli di emittente, proprietario, e verificatore. Per es. gli studenti in possesso del titolo di studio emesso dall'università, lo mettono a disposizione per la verifica da parte di un selezionatore di risorse umane. La verifica del certificato avviene utilizzando la chiave pubblica dell'università, e non richiede altre informazioni che dipendono dalla piattaforma software o da terzi.
+Registrando dei metadati nell'Indirizzo dello studente, le università li mettono a disposizione per la verifica del titolo di studio da compiersi con la chiave pubblica dell'università sull'Indirizzo con cui è stato creato il Mosaic dello studente, tale operazione è detta 'prova di appartenenza' (proof of ownership).
+I casi d'uso sono molteplici, per es. biglietti da visita con prova di contatto.
