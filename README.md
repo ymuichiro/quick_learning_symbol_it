@@ -54,13 +54,13 @@ con l'aiuto della comunità giapponese
 - [7.2 Registrare un Mosaic](07_metadata.md#72-memorizzazione-nel-mosaic)
 - [7.3 Registrare un Sinonimo](07_metadata.md#73-memorizzazione-nel-sinonimo)
 - [7.4 Conferma di esecuzione](07_metadata.md#74-convalida)
-- [7.5 Consigli pratici](07_metadata.md#75-consigli-[[Opratici)
+- [7.5 Consigli pratici](07_metadata.md#75-consigli-pratici)
 
 ### [8.Lock](./08_lock.md)
 
-- [8.1 Hash Lock](08_lock.md#81-Hash Lock)
-- [8.2 Secret Lock・Secret Proof](08_lock.md#82-Secret Lock)
-- [8.3 Consigli pratici](08_lock.md#83-onsigli pratici
+- [8.1 Hash Lock](08_lock.md#81-transazione-hash-lock)
+- [8.2 Secret Lock・Secret Proof](08_lock.md#82-transazioni-secret-lock-e-secret-proof)
+- [8.3 Consigli pratici](08_lock.md#83-consigli-pratici)
 
 ### [9.Intestatari delegati](./09_multisig.md)
 
