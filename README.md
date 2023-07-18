@@ -62,19 +62,19 @@ con l'aiuto della comunità giapponese
 
 ### [8.Lock](./08_lock.md)
 
-- [8.1 Hash Lock](08_lock.md#81-transazione-hash-lock)
-- [8.2 Secret Lock・Secret Proof](08_lock.md#82-transazioni-secret-lock-e-secret-proof)
+- [8.1 Transazione Hash Lock](08_lock.md#81-transazione-hash-lock)
+- [8.2 Transazioni Secret Lock・e Secret Proof](08_lock.md#82-transazioni-secret-lock-e-secret-proof)
 - [8.3 Consigli pratici](08_lock.md#83-consigli-pratici)
 
 ### [9.Intestatari delegati](./09_multisig.md)
 
-- [9.0 Preparare un Indirizzo](09_multisig.md#90-Preparare un Indirizzo)
-- [9.1 Registrare un delegato](09_multisig.md#91-Registrare un delegato)
-- [9.2 Conferma di esecuzione](09_multisig.md#92-Conferma di esecuzione)
-- [9.3 Firma di un delegato](09_multisig.md#93-Firma di un delegato)
-- [9.4 Conferma di una transazione delegata](09_multisig.md#94-Conferma di una transazione delegata)
-- [9.5 Modificare la soglia minima richiesta per l'approvazione](09_multisig.md#95-Modificare la soglia minima)
-- [9.6 Consigli pratici](09_multisig.md#96-Consigli pratici)
+- [9.1 Preparazione dell'Indirizzo Cointestato](09_multisig.md#91-preparazione-dellindirizzo-cointestato)
+- [9.2 Registrazione dei cointestatari](09_multisig.md#92-Registrazione-dei-cointestatari)
+- [9.3 Convalida di un Indirizzo Cointestato](09_multisig.md#93-convalida-di-un-indirizzo-cointestato)
+- [9.4 Eseguire una transazione dall'Indirizzo cointestato e firme dei cointestatari](09_multisig.md#94-eseguire-una-transazione-dallindirizzo-cointestato-e-firme-dei-cointestatari)
+- [9.5 Convalida di una transazione a firma multipla](09_multisig.md#95-convalida-di-una-transazione-a-firma-multipla)
+- [9.6 Modificare un Indirizzo Cointestato (numero minimo di firme)](09_multisig.md#96-modificare-un-indirizzo-cointestato-numero-minimo-di-firme)
+- [9.7 Consigli pratici](09_multisig.md#97-consigli-pratici)
 
 ### [10.Monitoraggio](./10_observer.md)
 

@@ -5,7 +5,7 @@ Gli Indirizzi della blockchain Symbol possono essere cointestati.
 
 Gli indirizzi cointestati accettano fino a 25 cofirmatari. Un Indirizzo di per sè, può comparire nella lista di cofirmatari di al massimo 25 Indirizzi cointestati diversi. Gli Indirizzi cointestati possono essere strutturati in modo gerarchico per un massimo di 3 livelli. Questo capitolo descrive indirizzi cointestati di primo livello.
 
-## 9.0 Preparazione dell'Indirizzo Cointestato
+## 9.1 Preparazione dell'Indirizzo Cointestato
 
 Creiamo gli Indirizzi usati nel codice sorgente nell'esempio di questo capitolo e ne stampiamo la chiave privata
 Si fa notare che l'Indirizzo di Bob in questo capitolo, essendo cointestato, diverà inutilizzabile se andasse persa la chiave privata di Carol.
@@ -37,7 +37,7 @@ console.log("https://testnet.symbol.tools/?recipient=" + bob.address.plain() +"&
 console.log("https://testnet.symbol.tools/?recipient=" + carol1.address.plain() +"&amount=20");
 ```
 
-## 9.1 Registrazione dei cointestatari
+## 9.2 Registrazione dei cointestatari
 
 La blockchain Symbol non vincola alla creazione di un nuovo Indirizzo, anche un Indirizzo già esistente si può essere convertito in indirizzo cointestato. I cofirmatari possono essere Indirizzi già esistenti.
 Per creare un Indirizzo cointestato è necessario che ogni Indirizzo cointestato apponga una firma di consenso (opt-in). Utilizziamo una Transazione di Gruppo.
@@ -68,7 +68,7 @@ signedTx =  aggregateTx.signTransactionWithCosignatories(
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 9.2 Convalida di un Indirizzo cointestato
+## 9.3 Convalida di un Indirizzo cointestato
 
 ### Controllo dello stato della transazione accettata dal nodo per un Indirizzo cointestato
 ```js
@@ -182,7 +182,7 @@ await txRepo.announceAggregateBonded(signedAggregateTx).toPromise();
 Quando una transazione bonded diventa di conoscenza del nodo, il suo stato è detto di 'firma parziale', e potrà essere firmata con un Indirizzo cofirmatario, usando il metodo cofirmatario descritto nel capitolo [8.Lock](./08_lock.md). Alternativamente può anche essere firmata da un wallet dotato di funzionalità cofirmatario.
 
 
-## 9.4 Convalida di una transazione a firma multipla
+## 9.5 Convalida di una transazione a firma multipla
 
 Controlliamo il risultato dell'esecuzione della transazione a firma multipla.
 
@@ -251,7 +251,7 @@ console.log(txInfo);
         - AggregateTransaction.cosignatures[1].signer.address
             - TBAFGZOCB7OHZCCYYV64F2IFZL7SOOXNDHFS5NY
 
-## 9.5 Modificare un Indirizzo cointestato (numero minimo di firme)
+## 9.6 Modificare un Indirizzo cointestato (numero minimo di firme)
 
 ### Modifica della configurazione dell'Indirizzo cointestato
 
@@ -310,7 +310,7 @@ signedTx =  aggregateTx.signTransactionWithCosignatories(
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 9.6 Consigli pratici
+## 9.7 Consigli pratici
 
 ### Autenticazione a più fattori
 
