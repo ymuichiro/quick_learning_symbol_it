@@ -1,15 +1,14 @@
-# 9. Multisignature
-Symbol accounts can be converted to multisig.
+# 9.Intestatari delegati
+Gli Indirizzi della blockchain Symbol possono essere cointestati.
 
+### Concetti di base
 
-### Points
+Gli indirizzi cointestati accettano fino a 25 cofirmatari. Un Indirizzo di per sè, può comparire nella lista di cofirmatari di al massimo 25 Indirizzi cointestati diversi. Gli Indirizzi cointestati possono essere strutturati in modo gerarchico per un massimo di 3 livelli. Questo capitolo descrive indirizzi cointestati di primo livello.
 
-Multisig accounts can have up to 25 co-signatories. An account can be cosigner of up to 25 multisig accounts. Multisig accounts can be hierarchical and composed of up to 3 levels. This chapter explains single-level multisig.
+## 9.0 Preparazione dell'Indirizzo Cointestato
 
-## 9.0 Preparing an account
-Create the accounts used in the sample source code in this chapter and output each secret key.
-Note that the Bob multisig account in this chapter will be unusable if Carol's secret key is lost.
-
+Creiamo gli Indirizzi usati nel codice sorgente nell'esempio di questo capitolo e ne stampiamo la chiave privata
+Si fa notare che l'Indirizzo di Bob in questo capitolo, essendo cointestato, diverà inutilizzabile se andasse persa la chiave privata di Carol.
 
 ```js
 bob = sym.Account.generateNewAccount(networkType);
@@ -26,9 +25,9 @@ console.log(carol4.privateKey);
 console.log(carol5.privateKey);
 ```
 
-When using a testnet, the equivalent of the network fee from the faucet should be available in the bob and carol1 accounts.
+Utilizzando la rete di test, possiamo avvalerci del faucet per trasferire negli Indirizzi di Bob e Carol, una quandità di xym adeguata per consentirci di pagare le commissioni di transazione.
 
-- Faucet
+- Indirizzo Internet del Faucet
     - https://testnet.symbol.tools/
 
 ##### Output URL
@@ -38,10 +37,10 @@ console.log("https://testnet.symbol.tools/?recipient=" + bob.address.plain() +"&
 console.log("https://testnet.symbol.tools/?recipient=" + carol1.address.plain() +"&amount=20");
 ```
 
-## 9.1 Multisig registration
+## 9.1 Registrazione dei cointestatari
 
-Symbol does not need to create a new account when setting up a multisig. Instead co-signatories can be specified for an existing account.
-Creating a multisig account requires the consent signature (opt-in) of the account designated as the co-signatory. Aggregate Transactions are used to confirm this.
+La blockchain Symbol non vincola alla creazione di un nuovo Indirizzo, anche un Indirizzo già esistente si può essere convertito in indirizzo cointestato. I cofirmatari possono essere Indirizzi già esistenti.
+Per creare un Indirizzo cointestato è necessario che ogni Indirizzo cointestato apponga una firma di consenso (opt-in). Utilizziamo una Transazione di Gruppo.
 
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
@@ -60,24 +59,24 @@ aggregateTx = sym.AggregateTransaction.createComplete(
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]
-).setMaxFeeForAggregate(100, 4); //Number of co-signatories to the second argument:4
+).setMaxFeeForAggregate(100, 4); //Il numero di cointestatari come secondo parametro è 4
 signedTx =  aggregateTx.signTransactionWithCosignatories(
-    bob, //Multisig account
-    [carol1,carol2,carol3,carol4], //Accounts specified as being added or removed
+    bob, //Indirizzo cointestato
+    [carol1,carol2,carol3,carol4], //Indirizzi da aggiungere (è consentito anche rimuovere)
     generationHash,
 );
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 9.2 Confirmation
+## 9.2 Convalida di un Indirizzo cointestato
 
-### Confirmation of multisig account
+### Controllo dello stato della transazione accettata dal nodo per un Indirizzo cointestato
 ```js
 msigRepo = repo.createMultisigRepository();
 multisigInfo = await msigRepo.getMultisigAccountInfo(bob.address).toPromise();
 console.log(multisigInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > MultisigAccountInfo 
     accountAddress: Address {address: 'TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q', networkType: 152}
@@ -91,16 +90,15 @@ console.log(multisigInfo);
     multisigAddresses: []
 ```
 
-It shows that cosignatoryAddresses are registered as co-signatories. Also, minApproval:3 shows that the number of signatures required for a transaction to execute is 3. minRemoval: 3 shows that the number of signatories required to remove a cosignatory is 3.
+Mostra che gli Indirizzi cofirmatari sono stati registrati. Il valore `minApproval` indica il numero minimo di firme richieste per eseguire una transazione dall'Indirizzo cointestato. Il valore `minRemoval` mostra il numero minimo di firme per rimuovere un cointestatario.
 
-
-### Confirmation of co-signatory accounts
+### Convalida di un Indirizzo cofirmatario
 ```js
 msigRepo = repo.createMultisigRepository();
 multisigInfo = await msigRepo.getMultisigAccountInfo(carol1.address).toPromise();
 console.log(multisigInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```
 > MultisigAccountInfo
     accountAddress: Address {address: 'TCV67BMTD2JMDQOJUDQHBFJHQPG4DAKVKST3YJI', networkType: 152}
@@ -111,87 +109,88 @@ console.log(multisigInfo);
         0: Address {address: 'TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q', networkType: 152}
 ```
 
-It shows that the account is a cosignatory of the multisigAddresses.
+Mostra che l'Indirizzo è cofirmatario per un Indirizzo cointestato (elencato nell'array `multisigAddresses`).
 
-## 9.3 Multisig signature
+## 9.3 Eseguire una transazione dall'Indirizzo cointestato e firme dei cointestatari 
 
-Send mosaics from a multisig account.
+Supponiamo di inviare un Mosaic dall'Indirizzo cointestato.
+Possiamo farlo sia con una transazione Aggregate Complete, sia con una transazione Aggregate Bonded
 
-### Transfer with an Aggregate Complete Transaction
+### Caso Transazione di Gruppo Aggregate Complete
 
-In the case of Aggregate Complete Transaction, the transaction is created after collecting all the signatures of the cosignatories before announcing it to the nodes.
+Condizione sufficiente per eseguire una Transazione di Gruppo di tipo 'Aggregate Complete' è che un numero minimo (`minApproval`) di cofirmatari apponga la firma prima della propagazione della transazione alla rete.
 
 ```js
 tx = sym.TransferTransaction.create(
     undefined,
-    alice.address, 
+    alice.address,  //Trasferimento ad Alice
     [new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(1000000))],
     sym.PlainMessage.create('test'),
     networkType
 );
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
-     [//The public key of the multisig account
+     [//Imposta la chiave pubblica del mittente, Indirizzo cointestato 
        tx.toAggregate(bob.publicAccount)
      ],
     networkType,[],
-).setMaxFeeForAggregate(100, 2); //Number of co-signatories to the second argument:2
+).setMaxFeeForAggregate(100, 2); //Numero di cofirmatari come secondo argomento:2
 signedTx =  aggregateTx.signTransactionWithCosignatories(
-    carol1, //Transaction creator
-    [carol2,carol3],　//Cosignatories
+    carol1, //Indirizzo che ha creato la transazione
+    [carol2,carol3],　//Cofirmatari
     generationHash,
 );
 await txRepo.announce(signedTx).toPromise();
 ```
 
-### Transfer with an Aggregate Bonded Transaction
+### Caso Transazione di Gruppo Aggregate Bonded
 
-Aggregate bonded transactions can be announced without specifying co-signatories. It is completed by declaring that the transaction will be pre-stored with a hash lock, and the co-signer additionally signs the transaction once it has been stored on the network.
+Una transazione Aggregate Bonded si può propagare senza specificare i cofirmatari. Verrà completata dichiarando un `hash lock`, solo dopo che la rete l'avrà registrata, l'Indirizzo cofirmatario apporrà la firma.
 
 ```js
 tx = sym.TransferTransaction.create(
     undefined,
-    alice.address, //Transfer to Alice
+    alice.address, //Trasferimento ad Alice
     [new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(1000000))], //1XYM
     sym.PlainMessage.create('test'),
     networkType
 );
 aggregateTx = sym.AggregateTransaction.createBonded(
     sym.Deadline.create(epochAdjustment),
-     [ //The public key of the multisig account
+     [ //Chiave pubblica dell'Indirizzo cointestato 
        tx.toAggregate(bob.publicAccount)
      ],
     networkType,[],
-).setMaxFeeForAggregate(100, 0); //Number of co-signatories to the second argument:0
+).setMaxFeeForAggregate(100, 0); //Numero di cofirmatari come secondo argomento:0
 signedAggregateTx = carol1.sign(aggregateTx, generationHash);
 hashLockTx = sym.HashLockTransaction.create(
   sym.Deadline.create(epochAdjustment),
-	new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(10 * 1000000)), //Fixed value:10XYM
+	new sym.Mosaic(new sym.NamespaceId("symbol.xym"),sym.UInt64.fromUint(10 * 1000000)), //Commissione fissa:10XYM
 	sym.UInt64.fromUint(480),
 	signedAggregateTx,
 	networkType
 ).setMaxFee(100);
 signedLockTx = carol1.sign(hashLockTx, generationHash);
-//Announce Hashlock TX
+//Propagazione Transazione Hashlock
 await txRepo.announce(signedLockTx).toPromise();
 ```
 
 ```js
-//Announces bonded TX after confirming approval of hashlocks
+//Propagazione della transazione bonded dopo la conferma della propagazione della transazione Hashlock
 await txRepo.announceAggregateBonded(signedAggregateTx).toPromise();
 ```
-When a bonded transaction is known by a node, it will be a partial signature state and will be signed with a multisig account, using the co-signature introduced in chapter 8. Locking. It can also be confirmed by a wallet that supports co-signatures.
+Quando una transazione bonded diventa di conoscenza del nodo, il suo stato è detto di 'firma parziale', e potrà essere firmata con un Indirizzo cofirmatario, usando il metodo cofirmatario descritto nel capitolo [8.Lock](./08_lock.md). Alternativamente può anche essere firmata da un wallet dotato di funzionalità cofirmatario.
 
 
-## 9.4 Confirmation of multisig transfer
+## 9.4 Convalida di una transazione a firma multipla
 
-Check the results of a multisig transfer transaction.
+Controlliamo il risultato dell'esecuzione della transazione a firma multipla.
 
 ```js
 txInfo = await txRepo.getTransaction(signedTx.hash,sym.TransactionGroup.Confirmed).toPromise();
 console.log(txInfo);
 ```
-###### Sample output
+###### Output esemplificativo
 ```js
 > AggregateTransaction
   > cosignatures: Array(2)
@@ -236,15 +235,15 @@ console.log(txInfo);
     type: 16705
 ```
 
-- Multisig account
+- Indirizzo Cointestato
     - Bob
         - AggregateTransaction.innerTransactions[0].signer.address
             - TCOMA5VG67TZH4X55HGZOXOFP7S232CYEQMOS7Q
-- Creator's account
+- Indirizzo di creazione della transazione
     - Carol1
         - AggregateTransaction.signer.address
             - TCV67BMTD2JMDQOJUDQHBFJHQPG4DAKVKST3YJI
-- Co-signer account
+- Indirizzo cofirmatario
     - Carol2
         - AggregateTransaction.cosignatures[0].signer.address
             - TB3XP4GQK6XH2SSA2E2U6UWCESNACK566DS4COY
@@ -252,28 +251,28 @@ console.log(txInfo);
         - AggregateTransaction.cosignatures[1].signer.address
             - TBAFGZOCB7OHZCCYYV64F2IFZL7SOOXNDHFS5NY
 
-## 9.5 Modifying a multisig account min approval
+## 9.5 Modificare un Indirizzo cointestato (numero minimo di firme)
 
-### Editing multisig configuration
+### Modifica della configurazione dell'Indirizzo cointestato
 
-To reduce the number of co-signatories, specify the address to remove and adjust the number of co-signatories so that the minimum number of signatories is not exceeded and then announce the transaction. It is not necessary to include the account subject to remove as a co-signatory.
+Per ridurre il numero di cofirmatari di un Indirizzo cointestato, specificare l'Indirizzo da rimuovere e cambiare di conseguenza il numero minimo di cofirmatari di conseguenza, quindi propagare la transazione. E' necessario includere l'Indirizzo in questione perchè sia rimosso dai cofirmatari.
 
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
     undefined, 
-    -1, //Minimum incremental number of signatories required for approval
-    -1, //Minimum incremental number of signatories required for remove
-    [], //Additional target address
-    [carol3.address],//Address to removing
+    -1, //Riduce di uno il numero minimo di cofirmatari per l'approvazione di transazioni
+    -1, //Riduce di uno il numero minimo di cofirmatari per rimuovere cofirmatari
+    [], //Eventuale altro Indirizzo 
+    [carol3.address],//Indirizzo da rimuovere
     networkType
 );
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
-    [ //Specify the public key of the multisig account which configuration you want to change
+    [ //Specificare la chiave pubblica dell'Indirizzo cointestato da modificare
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]    
-).setMaxFeeForAggregate(100, 1); //Number of co-signatories to the second argument:1
+).setMaxFeeForAggregate(100, 1); //numero di cofirmatari come secondo argomento:1
 signedTx =  aggregateTx.signTransactionWithCosignatories(
     carol1,
     [carol2],
@@ -282,47 +281,48 @@ signedTx =  aggregateTx.signTransactionWithCosignatories(
 await txRepo.announce(signedTx).toPromise();
 ```
 
-### Replacement of co-signatories
+### Sostituzione di cofirmatari
 
-To replace a co-signatory, specify the address to be added and the address to be removed.
-The co-signature of the new additionally designated account is always required.
+Per sostituire un cofirmatario, specificare l'Indirizzo da aggiungere e l'Indirizzo da togliere.
+Si chiede sempre la firma del nuovo Indirizzo cofirmatario.
 
 ```js
 multisigTx = sym.MultisigAccountModificationTransaction.create(
     undefined, 
-    0, //Minimum incremental number of signatories required for approval
-    0, //Minimum incremental number of signatories required for remove
-    [carol5.address], //Additional target address
-    [carol4.address], //Address to removing
+    0, //variazione sul numero di cofirmatari per l'approvazione di transazioni
+    0, //variazione sul numero minimo di cofirmatari per rimuovere cofirmatari
+    [carol5.address], //Indirizzo aggiuntivo
+    [carol4.address], //Indirizzo da rimuovere
     networkType
 );
 aggregateTx = sym.AggregateTransaction.createComplete(
     sym.Deadline.create(epochAdjustment),
-    [ //Specify the public key of the multisig account which configuration you want to change
+    [ //specificare la chiave pubblica dell'Indirizzo cointestato da modificare
       multisigTx.toAggregate(bob.publicAccount),
     ],
     networkType,[]    
-).setMaxFeeForAggregate(100, 2); //Number of co-signatories to the second argument:
+).setMaxFeeForAggregate(100, 2); //Numero di cofirmatari nel secondo argomento: 2
 signedTx =  aggregateTx.signTransactionWithCosignatories(
-    carol1, //Transaction creator
-    [carol2,carol5], //Cosignatory + Consent account
+    carol1, //Indirizzo che crea la transazione
+    [carol2,carol5], //cofirmatari per consenso
     generationHash,
 );
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 9.6 Tips for use
+## 9.6 Consigli pratici
 
-### Multi-factor authorisation
+### Autenticazione a più fattori
 
-The management of private keys can be distributed across multiple terminals. Multisigs can be used to ensure safe recovery in the event of a lost or compromised key. If the key is lost then the user can access funds through co-signatories and if stolen then the attacker cannot transfer funds without cosignatory approval.
+La gestione delle chiavi private può essere distribuita su più terminali. La cointestazione si può usare per consentire il recupero nel caso di smarrimento o compromissione di chiavi. In caso di perdita di chiave l'utente può operare con le chiavi dei cofirmatari, in caso di compromissione, l'intruso non può trasferire fondi senza il consenso dei cofirmatari.
 
-### Account ownership
+### Proprietà dell'Indirizzo
 
-The private key of a multisig account is deactivated and unless the multisig is removed on the account sending mosaics will no longer be possible. As explained in Chapter 5. Mosaics, possession is “the state of being able to give it up at will', it can be said the owner of the assets on a multisig account are the co-signatories. Symbol allows replacement of co-signatories in a multisig configuration, so account ownership can be securely replaceable to another co-signatory.
+La chiave privata di un Indirizzo cointestato è inattiva quindi non si possono trasferire Mosaic fino alla rimozione dei cofirmatari. Come spiegato nel capitolo [5.Mosaic](./05_mosaic.md), il possesso va inteso in modo dinamico, la proprietà delle monete in un Indirizzo cointestato coincide coi i cofirmatari. La blockchain Symbol consente di riconfigurare la cointestazione con la sostituzione in sicurezza dei cofirmatari. 
 
 ### Workflow
 
-Symbol allows you to configure up to 3 levels of multisig (multi-level multisig).
-The use of multi-level multisig accounts prevents the use of stolen backup keys to complete a multisig, or the use of only an approver and an auditor to complete a signature.
-This allows the existence of transactions on the blockchain to be presented as evidence that certain operations and conditions have been met.
+La blockchain Symbol permette di configurare fino a 3 livelli di cointestazione (multi-level multisig).
+L'uso di Indirizzi con più livelli di contestazione impedisce l'uso di chiavi rubate di backup, per
+confermare una cointestazione. Impedisce per esempio l'uso di un unico verificatore e approvatore alla firma,
+dando prova dell'esistenza di transazioni nella blockchain condizionate al soddisfacimento di requisiti.
