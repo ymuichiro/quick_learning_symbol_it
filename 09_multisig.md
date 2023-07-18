@@ -68,7 +68,7 @@ signedTx =  aggregateTx.signTransactionWithCosignatories(
 await txRepo.announce(signedTx).toPromise();
 ```
 
-## 9.3 Convalida di un Indirizzo cointestato
+## 9.3 Convalida di un Indirizzo Cointestato
 
 ### Controllo dello stato della transazione accettata dal nodo per un Indirizzo cointestato
 ```js
@@ -111,7 +111,7 @@ console.log(multisigInfo);
 
 Mostra che l'Indirizzo è cofirmatario per un Indirizzo cointestato (elencato nell'array `multisigAddresses`).
 
-## 9.3 Eseguire una transazione dall'Indirizzo cointestato e firme dei cointestatari 
+## 9.4 Eseguire una transazione dall'Indirizzo Cointestato e firme dei cointestatari 
 
 Supponiamo di inviare un Mosaic dall'Indirizzo cointestato.
 Possiamo farlo sia con una transazione Aggregate Complete, sia con una transazione Aggregate Bonded
