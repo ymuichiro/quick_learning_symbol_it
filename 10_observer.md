@@ -19,7 +19,7 @@ Segue il formato per collegarsi ad un endpoint.
 
 Il timeout per mantenere attiva la connessione è di 1 minuto, oltre il quale, se non c'è stato scambio di informazioni il listener viene scollegato.
 
-## 10.2 Recuperare transazioni
+## 10.2 Ricevere notifiche sulle ransazioni
 
 Per essere notificati delle transazioni convalidate (`confirmed`) che interessano un Indirizzo specificato (per es. Alice), si chiamano i seguenti metodi. Similmente per quelle propagate e non ancora convalidate.
 
@@ -66,7 +66,7 @@ Dopo aver impostato il listener, propaghiamo una transazione di test all'Indiriz
 
 Come si può verificare dai dati al campo `height`, le transazioni non ancora convalidate sono valorizzate con l'altezza del blocco a 0.
 
-## 10.3 Notifiche sui Blocchi 
+## 10.3 Ricevere notifiche sui blocchi 
 
 Per venire informati alla creazione dei nuovi blocchi.
 
