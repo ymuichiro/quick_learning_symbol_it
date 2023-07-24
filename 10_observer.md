@@ -1,10 +1,10 @@
-# 10. Monitoring
+# 10. Monitoraggio
 
-Symbol nodes can monitor blockchain state changes via WebSocket communication.
+I nodi della rete Symbol ricevono o inviano notifiche di cambi di stato o eventi attraverso la tecnologia di comunicazione WebSocket. 
 
-## 10.1 Listener configuration
+## 10.1 Configurazione del Listener
 
-Generate a WebSocket and configure a listener.
+Creazione di un WebSocket e configurazione del listener.
 
 ```js
 nsRepo = repo.createNamespaceRepository();
@@ -13,34 +13,34 @@ listener = new sym.Listener(wsEndpoint, nsRepo, WebSocket);
 listener.open();
 ```
 
-The format of the endpoints is as follows.
+Segue il formato per collegarsi ad un endpoint.
 
 - wss://{node url}:3001/ws
 
-If there is no communication, the listener is disconnected after one minute.
+Il timeout per mantenere attiva la connessione è di 1 minuto, oltre il quale, se non c'è stato scambio di informazioni il listener viene scollegato.
 
-## 10.2 Receiving transactions
+## 10.2 Recuperare transazioni
 
-Detects transactions received by the account.
+Per essere notificati delle transazioni convalidate (`confirmed`) che interessano un Indirizzo specificato (per es. Alice), si chiamano i seguenti metodi. Similmente per quelle propagate e non ancora convalidate.
 
 ```js
 listener.open().then(() => {
-  //Detection of approval transactions
+  //Sottoscrive per ricevere notifiche di transazioni convalidate
   listener.confirmed(alice.address).subscribe((tx) => {
-    //Describes the process after reception
+    //Stampa il dettaglio alla ricezione della notifica
     console.log(tx);
   });
-  //Detection of unconfirmed transactions
+  //Sottoscrive per ricevere notifiche di transazioni propagate non ancora convalidate
   listener.unconfirmedAdded(alice.address).subscribe((tx) => {
-    //Describes the process after reception
+    //Stampa il dettaglio alla ricezione della notifica
     console.log(tx);
   });
 });
 ```
 
-After executing the above listener, announce the transaction to be sent to Alice.
+Dopo aver impostato il listener, propaghiamo una transazione di test all'Indirizzo di Alice ottenendo quanto segue come notifica.
 
-###### Sample output
+###### Output esemplificativo
 
 ```js
 > Promise {<pending>}
@@ -64,20 +64,20 @@ After executing the above listener, announce the transaction to be sent to Alice
     version: 1
 ```
 
-Unconfirmed transactions are received with transactionInfo.height=0.
+Come si può verificare dai dati al campo `height`, le transazioni non ancora convalidate sono valorizzate con l'altezza del blocco a 0.
 
-## 10.3 Block monitoring
+## 10.3 Notifiche sui Blocchi 
 
-Detects newly generated blocks.
+Per venire informati alla creazione dei nuovi blocchi.
 
 ```js
 listener.open().then(() => {
-  //Detection of block generation
+  //sottoscrizione all'evento di nuovo blocco della blockchain
   listener.newBlock().subscribe((block) => console.log(block));
 });
 ```
 
-###### Sample output
+###### Output esemplificativo
 
 ```js
 > Promise {<pending>}
@@ -103,24 +103,24 @@ listener.open().then(() => {
     version: 1
 ```
 
-If listener.newBlock() is used, communication occurs approximately every 30 seconds, making WebSocket disconnections less likely to occur.
+Sottoscrivendo l'evento `listener.newBlock()`, la frequenza delle notifiche sarà di circa una ogni 30 secondi, e la probabilità di disconnessione per inattività sarà bassa.
 
-In rare cases, block generation may exceed one minute, in which case the listener must be reconnected. (Other factors may also cause disconnection, so if you want to be sure, supplement with onclose as described below.)
+In alcuni rari casi, il tempo per la generazione di un nuovo blocco potrebbe superare il minuto e il listener deve eseguire una riconnessione (Altri fattori potrebbero innescare la disconnessione perciò si consiglia di aggiungere altre chiamate di sottoscrizione come quelle descritte nella prossima sezione).
 
-## 10.4 Signature request
+## 10.4 Richieste di firma
 
-Detects when a transaction requiring a signature occurs.
+Notifica dell'evento di una transazione che richiede la firma.
 
 ```js
 listener.open().then(() => {
-  //Detection of Aggregate Bonded Transaction occurrences requiring signatures
+  //Evento di transazione di gruppo bonded che necessita la firma
   listener
     .aggregateBondedAdded(alice.address)
     .subscribe(async (tx) => console.log(tx));
 });
 ```
 
-###### Sample output
+###### Output esemplificativo
 
 ```js
 > AggregateTransaction
@@ -143,23 +143,23 @@ listener.open().then(() => {
     version: 1
 ```
 
-All Aggregate Transactions involving the specified address are detected.
-Whether a cosignature is required is determined by a separate filter.
+Tutte le transazioni aggregate che fanno riferimento all'Indirizzo specificato verranno notificate.
+L'evento relativo alla firma di un Indirizzo cointestato è distinto da questo e si userà un altro filtro apposito.
 
-## 10.5 Tips for use
+## 10.5 Consigli pratici
 
-### Continuous connection
+### Connessione perpetua
 
-Select randomly from the node list and try to connect.
+Scegliere dalla lista dei nodi uno che possa andar bene e tentare la connessione.
 
-##### Connection to node
+##### Collegamento ad un nodo 
 
 ```js
-//Node list
+//lista dei nodi
 NODES = ["https://node.com:3001",...];
 function connectNode(nodes) {
     const node = nodes[Math.floor(Math.random() * nodes.length)] ;
-    console.log("try:" + node);
+    console.log("tentativo con:" + node);
     return new Promise((resolve, reject) => {
         let req = new XMLHttpRequest();
         req.timeout = 2000; //timeout value:2sec(=2000ms)
@@ -191,10 +191,10 @@ function connectNode(nodes) {
 }
 ```
 
-Set a timeout value and re-select a node if connected node response is slow.
-Check the endpoint /node/health and reselect the node if the status is not normal.
+Nel caso in cui i tempi di risposta del nodo siano alti, impostare un timeout e cambiare nodo.
+Controllare anche il valore della risposta ad una richiesta `/node/health` e ricontrollare se lo stato del nodo non è normale.
 
-##### Creation of repositories
+##### Istanziare il repository
 
 ```js
 function createRepo(nodes) {
@@ -211,9 +211,9 @@ function createRepo(nodes) {
 }
 ```
 
-In rare cases, there are some nodes for which the /network/properties endpoint has not been freed, so the getEpochAdjustment() information is retrieved and checked. If it cannot be obtained, createRepo is read recursively.
+Eventualmente, alcuni nodi potrebbero non aver liberato la connessione al servizio `/network/properties`, succede raramente, ma la chiamata `getEpochAdjustment()` andrebbe controllata. Se non va a buon fine, andare in ricorsione su `createRepo`.
 
-##### Continuous connection listeners
+##### listeners delle connessioni perpetue
 
 ```js
 async function listenerKeepOpening(nodes) {
@@ -236,25 +236,25 @@ async function listenerKeepOpening(nodes) {
 }
 ```
 
-If the listener closes, it reconnects.
+Alla disconnessione del listener, si ricollega.
 
-##### Start of listener.
+##### Attivare il listener.
 
 ```js
 listener = await listenerKeepOpening(NODES);
 ```
 
-### Unsigned transaction auto-signature
+### Firma automatica di transazioni non firmate
 
-Detect unsigned transactions, then sign and announce to the network.  
-Two patterns of detection are required: reception during initial screen display and during screen viewing.
+Individuare transazioni non firmate e quindi firmarle e propagarle ai nodi della rete.
+Sono necessari due pattern di notifica: il primo al caricamento della pagina il secondo durante visualizzazione.
 
 ```js
-//read rxjs.operators
+//legge rxjs.operators
 op = require("/node_modules/rxjs/operators");
 rxjs = require("/node_modules/rxjs");
 
-//Aggregate Transaction detection
+//Aggancia le notifiche per transazioni aggregate
 bondedListener = listener.aggregateBondedAdded(bob.address);
 bondedHttp = txRepo
   .search({ address: bob.address, group: sym.TransactionGroup.Partial })
@@ -262,7 +262,7 @@ bondedHttp = txRepo
     op.delay(2000),
     op.mergeMap((page) => page.data)
   );
-//Completed transaction detection listeners for selected accounts
+//Imposta i listener per le transazioni confermate relative agli Indirizzi di interessse
 const statusChanged = function (address, hash) {
   const transactionObservable = listener.confirmed(address);
   const errorObservable = listener.status(address, hash);
@@ -277,7 +277,7 @@ const statusChanged = function (address, hash) {
     })
   );
 };
-//Cosignature execution
+//Esecuzione delle firme dei cofirmatari
 function exeAggregateBondedCosignature(tx) {
   txRepo
     .getTransactionsById(
@@ -285,17 +285,17 @@ function exeAggregateBondedCosignature(tx) {
       sym.TransactionGroup.Partial
     )
     .pipe(
-      //Only if the transaction is detected
+      //Solo nel caso di transazione notificata
       op.filter((aggTx) => aggTx.length > 0)
     )
     .subscribe(async (aggTx) => {
-      //If my account is designated as the signatory of the inner transaction
+      //Se il mio Indirizzo è in firma
       if (
         aggTx[0].innerTransactions.find((inTx) =>
           inTx.signer.equals(bob.publicAccount)
         ) != undefined
       ) {
-        //Sign with Alice transaction
+        //Transazione con la firma di Alice
         const cosignatureTx = sym.CosignatureTransaction.create(aggTx[0]);
         const signedTx = bob.signCosignatureTransaction(cosignatureTx);
         const cosignedAggTx = await txRepo
@@ -310,7 +310,7 @@ function exeAggregateBondedCosignature(tx) {
 bondedSubscribe = function (observer) {
   observer
     .pipe(
-      //If not already signed
+      //Se non è già stata firmata
       op.filter((tx) => {
         return !tx.signedByAccount(
           sym.PublicAccount.createFromPublicKey(bob.publicKey, networkType)
@@ -328,4 +328,4 @@ bondedSubscribe(bondedHttp);
 
 ##### Note
 
-To avoid auto-signing scam transactions, make sure that you ensure a checking procedure is carried out, e.g. by checking the sender's account.
+E' molto importante, per evitare di firmare automaticamente con il nostro Indirizzo transazioni fraudolente, ricordarsi di impostare una logica di controllo/filtro, per esempio verificando l'Indirizzo di chi ha inviato/creato la transazione.
