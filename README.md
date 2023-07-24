@@ -78,11 +78,11 @@ con l'aiuto della comunità giapponese
 
 ### [10.Monitoraggio](./10_observer.md)
 
-- [10.1 Configurazione del Listener](10_observer.md#101-Configurazione del Listener)
-- [10.2 Ricevere notifiche sulle transaczioni](10_observer.md#102-Ricevere notifiche sulle transazioni)
-- [10.3 Monitorare i blocchi](10_observer.md#103-Monitorare i blocchi)
-- [10.4 Richiedere una firma](10_observer.md#104-Richiedere una firma)
-- [10.5 Consigli pratici](10_observer.md#105-Consigli pratici)
+- [10.1 Configurazione del Listener](10_observer.md#101-configurazione-del-listener)
+- [10.2 Ricevere notifiche sulle transaczioni](10_observer.md#102-ricevere-notifiche-sulle-transazioni)
+- [10.3 Ricevere notifiche sui blocchi](10_observer.md#103-ricevere-notifiche-sui-blocchi)
+- [10.4 Richieste di firma](10_observer.md#104-richieste-di-firma)
+- [10.5 Consigli pratici](10_observer.md#105-consigli-pratici)
 
 ### [11.Limitazioni](./10_restriction.md)
 
