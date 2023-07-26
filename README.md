@@ -80,11 +80,11 @@ con l'aiuto della comunità giapponese
 - [10.4 Richieste di firma](10_observer.md#104-richieste-di-firma)
 - [10.5 Consigli pratici](10_observer.md#105-consigli-pratici)
 
-### [11.Limitazioni](./10_restriction.md)
+### [11.Impostare restrizioni](./11_restriction.md)
 
-- [11.1 Limiti dell'Indirizzo](11_restriction.md#111-Limiti dell'Indirizzo)
-- [11.2 Limiti globali del Mosaic](11_restriction.md#112-Limiti del Mosaic)
-- [11.3 Consigli pratici](11_restriction.md#113-Consigli pratici)
+- [11.1 Restrizioni sugli Indirizzi](11_restriction.md#111-restrizioni-sugli-indirizzi)
+- [11.2 Restrizioni globali sul Mosaic](11_restriction.md#112-restrizioni-globali-sul-mosaic)
+- [11.3 Consigli pratici](11_restriction.md#113-consigli-pratici)
 
 ### [12.Firme a freddo](./12_offline_signature.md)
 
