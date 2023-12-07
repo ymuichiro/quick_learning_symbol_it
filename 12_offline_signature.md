@@ -1,13 +1,13 @@
-# 12.Offline Signatures
+# 12.Firme a freddo (offline)
 
-The chapter on Locks, explained the Lock transactions with a hash value specification and the Aggregate transaction, which collects multiple signatures (online signatures).  
-This chapter explains offline signing, which involves collecting signatures in advance and announcing the transaction to the node.
+Nel capitolo sui `Lock`, sono state descritte le transazioni con lock il cui parametro è un determinato valore hash, e le transazioni di gruppo `Aggregate transaction`, la cui esecuzione richiede firme multiple (`online signatures`).  
+Questo capitolo descrive come firmare a freddo (`offline`), che consiste nel raccogliere le firme in anticipo e poi propagare la transazione ai nodi della rete blockchain.
 
-## Procedure
+## Procedura
 
-Alice creates and signs the transaction. Then Bob signs it and returns it to Alice. Finally, Alice combines the transactions and announces them to the network.
+Alice crea e firma una transazione, quindi Bob ne appone la firma e la restituisce ad Alice. Ora Alice è pronta a combinare le due transazioni e propagarle alla rete in un colpo solo.
 
-## 12.1 Transaction creation
+## 12.1 Creazione della Transazione
 
 ```js
 bob = sym.Account.generateNewAccount(networkType);
@@ -45,30 +45,31 @@ signedPayload = signedTx.payload;
 console.log(signedPayload);
 ```
 
-###### Sample output
+###### Output esemplificativo
 
 ```js
 >580100000000000039A6555133357524A8F4A832E1E596BDBA39297BC94CD1D0728572EE14F66AA71ACF5088DB6F0D1031FF65F2BBA7DA9EE3A8ECF242C2A0FE41B6A00A2EF4B9020E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198414100AF000000000000D4641CD902000000306771D758886F1529F9B61664B0450ED138B27CC5E3AE579C16D550EDEE5791B00000000000000054000000000000000E5C72B0D5946C1EFEE7E5317C5985F106B739BB0BC07E4F9A288417B3CD6D26000000000198544198A1BE13194C0D18897DD88FE3BC4860B8EEF79C6BC8C8720400000000000000007478310000000054000000000000003C4ADF83264FF73B4EC1DD05B490723A8CFFAE1ABBD4D4190AC4CAC1E6505A5900000000019854419850BF0FD1A45FCEE211B57D0FE2B6421EB81979814F629204000000000000000074783200000000
 ```
 
-Sign and output signedHash, signedPayload. Pass signedPayload to Bob to prompt him to sign.
+Alice ha firmato e l'output è `signedHash`, `signedPayload`. 
+A questo punto passare `signedPayload` a Bob chiedendogli di firmare.
 
-## 12.2 Cosignature by Bob
+## 12.2 Firma del cointestatario Bob
 
-Restore the transaction with the signedPayload received from Alice.
+Per ricostruire la transazione partendo dal `signedPayload` che gli ha comunicato Alice.
 
 ```js
 tx = sym.TransactionMapping.createFromPayload(signedPayload);
 console.log(tx);
 ```
 
-###### Sample outlet
+###### Output esemplificativo
 
 ```js
 > AggregateTransaction
     cosignatures: []
     deadline: Deadline {adjustedValue: 12197090355}
-  > innerTransactions: Array(2)
+> innerTransactions: Array(2)
       0: TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
       1: TransferTransaction {type: 16724, networkType: 152, version: 1, deadline: Deadline, maxFee: UInt64, …}
     maxFee: UInt64 {lower: 44800, higher: 0}
@@ -83,7 +84,7 @@ console.log(tx);
     version: 1
 ```
 
-To make sure, verify whether the transaction (payload) has already been signed by Alice.
+Assicurarsi che il corpo della transazione `payload` sia stato già firmato da Alice.
 
 ```js
 Buffer = require("/node_modules/buffer").Buffer;
@@ -97,13 +98,13 @@ res = tx.signer.verifySignature(
 console.log(res);
 ```
 
-###### Sample output
+###### Output esemplificativo
 
 ```js
 > true
 ```
 
-It has been verified that the payload is signed by the signer Alice, then Bob co-signs.
+Una volta verificato che il payload è stato effettivamente firmato da Alice, Bob potrà a sua volta apporre la propria firma di cofirmatario.
 
 ```js
 bobSignedTx = sym.CosignatureTransaction.signTransactionPayload(
@@ -114,13 +115,13 @@ bobSignedTx = sym.CosignatureTransaction.signTransactionPayload(
 bobSignedTxSignature = bobSignedTx.signature;
 bobSignedTxSignerPublicKey = bobSignedTx.signerPublicKey;
 ```
+Dopo aver apposto la firma Bob comunica `bobSignedTxSignature` e `bobSignedTxSignerPublicKey` ad Alice.
 
-Bob signs with the signatureCosignatureTransaction and outputs bobSignedTxSignature, bobSignedTxSignerPublicKey then returns these to Alice.  
-If Bob can create all of the signatures then Bob can also make the announcement without having to return it to Alice.
+Se Bob potesse creare tutte le firme necessarie, allora potrebbe anche eseguire la propagazione senza dover comunicare più nulla ad Alice.
 
-## 12.3 Announcement by Alice
+## 12.3 Propagazione fatta da Alice
 
-Alice receives bobSignedTxSignature, bobSignedTxSignerPublicKey from Bob. Also, prepare a signedPayload created by Alice herself in advance.
+Dopo aver ricevuto `bobSignedTxSignature` e `bobSignedTxSignerPublicKey` da Bob, Alice prepara il payload della transazione che li contiene e firmando in anticipo a proprio nome.
 
 ```js
 signedHash = sym.Transaction.createTransactionHash(
@@ -165,8 +166,8 @@ signedTx = new sym.SignedTransaction(
 await txRepo.announce(signedTx).toPromise();
 ```
 
-The latter part of adding a series of signatures would be a little difficult as it directly manipulates the Payload (size value).
-If the private key of Alice can be used to sign the transaction again, it is possible to generate cosignSignedTxs and then generate a cosigned transaction as follows.
+L'ultima parte, nel ciclo che consiste nell'aggiungere una serie di firme è più complessa perchè modifica direttamente il payload cambiandone la dimensione.
+Se la chiave privata di Alice potesse essere usata per firmare ancora la transazione, si potrebbero generare transazioni cointestate `cosignSignedTxs` nel modo seguente.
 
 ```js
 resignedTx = recreatedTx.signTransactionGivenSignatures(
@@ -177,14 +178,14 @@ resignedTx = recreatedTx.signTransactionGivenSignatures(
 await txRepo.announce(resignedTx).toPromise();
 ```
 
-## 12.4 Tips for use
+## 12.4 Consigli pratici
 
-### Beyond the marketplace
+### Oltre il mercato di scambio
 
-Unlike Bonded Transactions, there is no need to pay fees (10XYM) for hashlocks.  
-If the payload can be shared, the seller can create payloads for all possible potential buyers and wait for negotiations to start.
-(Exclusion control should be used, e.g. by mixing only one existing receipt NFT into the Aggregate Transaction, so that multiple transactions are not executed separately).
-There is no need to build a dedicated marketplace for these negotiations.
-Users can use a social networking timeline as a marketplace, or develop a one-time marketplace at any time or in any space as required.
-
-Just be careful of spoofed hash signature requests, as signatures are exchanged offline (always generate and sign a hash from a verifiable payload).
+Diversamente dalle transazioni di tipo `bonded` (legate), non è necessario pagare
+commissioni (10 XYM), per gli `hashlock`.
+Essendo il payload condivisibile con altri, un venditore potrà creare preventivamente tanti payload quanti i possibili acquirenti potenziali ed attendere che partano le negoziazioni.
+(Andrebbero applicati dei meccanismi di esclusione. Per esempio, includendo una ricevuta NFT completa nella transazione di gruppo, per impedire che più transazioni vengano eseguite separatamente).
+Non è necessario creare un mercato di scambio dedicato per queste negoziazioni.
+Gli utenti possono usare una politica di tipo social network oppure sviluppare un'istanza di mercato dedicato istantanea.
+Fare attenzione in particolare al rischio di intercettazione maligna, degli hash delle richieste di firma. Essendo questi scambiati in modalità offline, è necessario generare e firmare i payload da una fonte verificabile).
