@@ -90,16 +90,16 @@ con l'aiuto della comunità giapponese
 - [11.2 Restrizioni globali sul Mosaic](11_restriction.md#112-restrizioni-globali-sul-mosaic)
 - [11.3 Consigli pratici](11_restriction.md#113-consigli-pratici)
 
-### [12.Firme a freddo](./12_offline_signature.md)
+### [12.Firme a freddo (offline)](./12_offline_signature.md)
 
-- [12.1 Creazione di una transazione](12_offline_signature.md#121-Creazione di una transazione)
-- [12.2 Delega a Bob](12_offline_signature.md#122-Delega a Bob)
-- [12.3 Propagazione da Alice](12_offline_signature.md#123-Propagazione da Alice)
-- [12.4 Consigli pratici](12_offline_signature.md#124-Consigli pratici)
+- [12.1 Creazione della Transazione](12_offline_signature.md#121-creazione-della-transazione)
+- [12.2 Firma del cointestatario Bob](12_offline_signature.md#122-firma-del-cointestatario-bob)
+- [12.3 Propagazione fatta da Alice](12_offline_signature.md#123-propagazione-fatta-da-alice)
+- [12.4 Consigli pratici](12_offline_signature.md#124-consigli-pratici)
 
 ### [13.Verifica di validità](./13_verify.md)
 
-- [13.1 Validità di una transazione](13_verify.md#131-Validità di una transazione)
-- [13.2 Validità del blocco](13_verify.md#132-Validità del blocco)
-- [13.3 Validità dell'Indirizzo](13_verify.md#133-Validità dell'Indirizzo)
-- [13.4 Consigli pratici](13_verify.md#134-Consigli pratici)
+- [13.1 Validità di una transazione](13_verify.md#131-validita-di-una-transazione)
+- [13.2 Validità del blocco](13_verify.md#132-validita-del-blocco)
+- [13.3 Validità dell'Indirizzo](13_verify.md#133-validita-dell-indirizzo)
+- [13.4 Consigli pratici](13_verify.md#134-consigli-pratici)
