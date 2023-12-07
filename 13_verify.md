@@ -1,15 +1,16 @@
-# 13. Validation
+# 13. Verifica di validità
 
-Verify all kinds of information recorded on the blockchain.
-While recording data on the blockchain is done with the agreement of all nodes, 
- **referencing data** on the blockchain is achieved by obtaining information from a single 
-node. For this reason, to avoid making a new transaction based on information from an untrusted node, the data obtained from the node must be verified.
+Vanno verificate tutte le informazioni lette dalla blockchain.
+Le operazioni di memorizzazione nella blockchain vengono eseguite quando i nodi della rete raggiungono un punto di accordo.
+Diversamente dalla memorizzazione, la lettura di informazioni dalla blockchain,  
+ **referencing data** è una richiesta puntuale che si manda ad un nodo scelto. 
+Per tale motivo, sono disponibili le funzionalità di verifica dei dati letti. La verifica dei dati letti ci tutela dall'esecuzione di transazioni basate su informazioni che potrebbero essere state generata da un nodo inaffidabile.
 
-## 13.1 Transaction validation
+## 13.1 Validità di una transazione
 
-Verify that the transaction is included in the block header. If this verification succeeds, the transaction can be considered as authorised by blockchain agreement.
+Verificare che la transazione sia stata inclusa nell'intestazione del blocco. Se questa verifica ha successo, la transazione si può considerare essere stata autorizzata dall'accordo di tutti i nodi della blockchain.
 
-Before running the sample scripts in this chapter, please load the following necessary libraries.
+Gli esempi di questo capitolo, richiedono il caricamento delle seguenti librerie.
 
 ```js
 Buffer = require("/node_modules/buffer").Buffer;
@@ -21,9 +22,9 @@ blockRepo = repo.createBlockRepository();
 stateProofService = new sym.StateProofService(repo);
 ```
 
-### Payload to be verified
+### Verifica del payload
 
-The transaction payload to be verified in this case and the block height at which the transaction is supposed to have been recorded.
+Il payload della transazione da verificare e la corrispondente altezza del blocco in cui è stata registrata.
 
 ```js
 payload =
@@ -31,9 +32,9 @@ payload =
 height = 59639;
 ```
 
-### Payload validation
+### Validazione del payload 
 
-Verify the contents of the transaction.
+Verifica del contenuto della transazione.
 
 ```js
 tx = sym.TransactionMapping.createFromPayload(payload);
@@ -45,7 +46,7 @@ console.log(hash);
 console.log(tx);
 ```
 
-###### Sample output
+###### Output esemplificativo
 
 ```js
 > 257E2CAECF4B477235CA93C37090E8BE58B7D3812A012E39B7B55BA7D7FFCB20
@@ -71,9 +72,9 @@ console.log(tx);
       type: 16705
 ```
 
-### Signatory validation
+### Validazione del firmatario
 
-The transaction can be verified by confirming that it has been included in the block, but just to make sure, it is possible to verify the signature of the transaction with the account's public key.
+La transazione può essere verificata ricevendo conferma che è stata inclusa nel blocco, ulteriormente è possibile verificare la firma della transazione con la chiave pubblica dell'Indirizzo.
 
 ```js
 res = alice.publicAccount.verifySignature(
@@ -90,14 +91,14 @@ console.log(res);
 > true
 ```
 
-Only the part to be signed is extracted in getSigningBytes.  
-Note that the part to be extracted is different for normal transactions and Aggregate Transactions.
+Solo la parte che verrà firmata sarà estratta da `getSigningBytes`.
+Notare che la parte da estrarre differisce a seconda che si tratti di una transazione semplice o una transazione di gruppo.
 
-### Calculation of the Merkle component hash
+### Calcolo del Merkle component hash
 
-The hash value of the transaction does not contain information about the co-signatory.  
-On the other hand, the Merkle root stored in the block header contains a hash of the transaction with the information of the co-signatory included.  
-Therefore, when verifying whether a transaction exists inside a block, the transaction hash must be converted to a Merkle component hash.
+Il valore hash della transazione non contiene informazioni sul cofirmatario.
+Le informazioni sul cofirmatario sono reperibili dall'hash della transazione che si trova nella radice del Merkle a sua volta inclusa nell'intestazione del blocco.
+Di conseguenza, per verificare se una transazione è contenuta in un blocco, l'hash della transazione deve essere convertito in un Merkle component hash.
 
 ```js
 merkleComponentHash = hash;
@@ -116,9 +117,9 @@ console.log(merkleComponentHash);
 > C8D1335F07DE05832B702CACB85B8EDAC2F3086543C76C9F56F99A0861E8F235
 ```
 
-### Inblock validation
+### Validazione InBlock
 
-Retrieve the Merkle tree from the node and check that the Merkle root of the block header can be derived from the merkleComponentHash calculated.
+Di seguito le istruzioni per recuperare l'albero Merkle dal nodo e controllare che la radice del Merkle che si strova nell'intestazione del blocco sia desumibile dal `MerkleComponentHash` calcolato.
 
 ```js
 function validateTransactionInBlock(leaf, HRoot, merkleProof) {
@@ -138,7 +139,7 @@ function validateTransactionInBlock(leaf, HRoot, merkleProof) {
   return HRoot.toUpperCase() === HRoot0.toUpperCase();
 }
 
-//Calculate from transaction
+//Calcolo dalla transazione
 leaf = merkleComponentHash.toLowerCase(); //merkleComponentHash
 
 //Retrieve from node
@@ -155,13 +156,13 @@ console.log(result);
 > true
 ```
 
-It has been verified that the transaction information is contained in the block header.
+Da cui segue che sono state verificate le informazioni della transazione nell'header del blocco.
 
-## 13.2 Block header validation
+## 13.2 Validità del blocco
 
-Verify that the known block hash value (e.g. finalised block) can be traced back to the block header that is being verified.
+Per verificare che il valore hash del blocco in nostro possesso (per es. un blocco irrevocabile), è collegato con l'intesazione del blocco da verificare.
 
-### Normal block validation
+### Validazione del blocco 
 
 ```js
 block = await blockRepo.getBlockByHeight(height).toPromise();
@@ -204,13 +205,13 @@ if (block.type === sym.BlockType.NormalBlock) {
 }
 ```
 
-If the output was true, this block hash acknowledges the existence of the previous block hash value. In the same way, the "n"th block confirms the existence of the "n-1th" block and finally arrives at the block being verified.
+Se l'output ha valore di verità `true`,  l'hash del blocco prova l'esistenza dell'hash del blocco precedente. Similmente, l'n-esimo blocco conferma l'esistenza del blocco n-1 fino al raggiungimento del blocco da verificare.
 
-Now we have a known finalised block that can be verified by querying any node to support the existence of the block to be verified.
+Ora che abbiamo un blocco irrevocabile certo da utilizzare per interrogare un nodo per verificare un nostro blocco particolare.
 
-### Importance block validation
+### Validazione del blocco di tipo Importance 
 
-ImportanceBlocks are the blocks where the importance value is recalculated. Importance blocks occur every 720 blocks on Mainnet and every 180 blocks on Testnet. In addition to the NormalBlock, the following information is added.
+I blocchi di tipo Importance, contengono il valore omonimo, ricalcolato. I blocchi Importance hanno frequenza di uno ogni 720 blocchi nella Mainnet, e uno ogni 180 blocchi nella Testnet. Essi contengono in aggiunta alle informazioni che si possono trovare in un blocco normale, anche le seguenti:
 
 - votingEligibleAccountsCount
 - harvestingEligibleAccountsCount
@@ -275,9 +276,9 @@ if (block.type === sym.BlockType.ImportanceBlock) {
 }
 ```
 
-Verifying stateHashSubCacheMerkleRoots for accounts and metadata which is described below.
+La verifica di `stateHashSubCacheMerkleRoots` per gli Indirizzi e i metadati sono descritti in seguito.
 
-### Importance block stateHash validation
+### Validazione di Importance block stateHash
 
 ```js
 console.log(block);
@@ -319,17 +320,17 @@ console.log(block.stateHash === hash);
 > true
 ```
 
-It can be seen that the nine states used to validate the block headers consist of stateHashSubCacheMerkleRoots.
+Si capisce che i nove valori di stato usati per validare l'intestazione del blocco, consistono di `stateHashSubCacheMerkleRoots`.
 
-## 13.3 Account metadata validation
+## 13.3 Validità dell'Indirizzo
 
-The Merkle Patricia Tree is used to verify the existence of accounts and metadata associated with a transaction.  
-If the service provider provides a Merkle Patricia tree, users can verify its authenticity using nodes of their own choosing.
+Il Merkle Patricia Tree si usa per verificare l'esistenza di Indirizzi e metadati associati ad una transazione.  
+Se il fornitore di servizi mette a disposizione un Merkle Patricia Tree, gli utenti possono verificarne l'autenticità usando un nodo a propria scelta.
 
-### Common functions for verification
+### Metodi per la verifica
 
 ```js
-//Function for obtaining the hash value of a leaf
+//Metodo per verificare il valore hash di una foglia
 function getLeafHash(encodedPath, leafValue) {
   const hasher = sha3_256.create();
   return hasher
@@ -338,7 +339,7 @@ function getLeafHash(encodedPath, leafValue) {
     .toUpperCase();
 }
 
-//Function for obtaining the hash value of a branch
+//Metodo per ottenere il valore hash di un ramo
 function getBranchHash(encodedPath, links) {
   const branchLinks = Array(16).fill(
     sym.Convert.uint8ToHex(new Uint8Array(32))
@@ -354,7 +355,7 @@ function getBranchHash(encodedPath, links) {
   return bHash;
 }
 
-//World State Verification
+//Verifica di tipo World State 
 function checkState(stateProof, stateHash, pathHash, rootHash) {
   const merkleLeaf = stateProof.merkleTree.leaf;
   const merkleBranches = stateProof.merkleTree.branches.reverse();
@@ -379,16 +380,16 @@ function checkState(stateProof, stateHash, pathHash, rootHash) {
     treePathHash = treePathHash.slice(0, -1);
   }
 
-  //verification
+  //verifica 
   console.log(treeRootHash === rootHash);
   console.log(treePathHash === pathHash);
 }
 ```
 
-### 13.3.1 Account information validation
+### 13.3.1 Validazione delle informazioni dell'Indirizzo
 
-Account information ia a leaf.
-Trace the branches on the Merkle tree by address and confirm whether the route can be reached.
+Le informazioni di un Indirizzo sono nella foglia.
+Visitare i rami dell'albero Merkle e raggiungerla.
 
 ```js
 stateProofService = new sym.StateProofService(repo);
@@ -407,20 +408,20 @@ hasher = sha3_256.create();
 aliceInfo = await accountRepo.getAccountInfo(aliceAddress).toPromise();
 aliceStateHash = hasher.update(aliceInfo.serialize()).hex().toUpperCase();
 
-//Obtaining up-to-date block header information from non-service provider nodes
+//Per ottenere l'intestazione aggiornata di un blocco da un nodo che non è service provider 
 blockInfo = await blockRepo.search({ order: "desc" }).toPromise();
 rootHash = blockInfo.data[0].stateHashSubCacheMerkleRoots[0];
 
-//Obtaining merkle information from any node, including service providers
+//Per ottenere le informazioni Merkle da un nodo qualsiasi, anche service provider
 stateProof = await stateProofService.accountById(aliceAddress).toPromise();
 
-//Verification
+//Verifica
 checkState(stateProof, aliceStateHash, alicePathHash, rootHash);
 ```
 
-### 13.3.2 Verification of metadata registered to the mosaic
+### 13.3.2 Verifica dei metadati di un Mosaic
 
-Metadata values are registered in the mosaic as a leaf. Trace the branches on the Merkle tree by the hash value consisting of the metadata key, and confirm whether the root can be reached.
+I valori dei metadati registrati in un Mosaic stanno nelle foglie. Visitare i rami dell'albero Merkle usando il valore hash della chiave del metadato e confirmare se la radice è raggiungibile.
 
 ```js
 srcAddress = Buffer.from(
@@ -465,20 +466,20 @@ hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2));
 hasher.update(value);
 stateHash = hasher.hex();
 
-//Obtaining up-to-date block header information from non-service provider nodes
+//Recuperare l'intestazione aggiornata dell'intestazione del blocco da un nodo  non service provider
 blockInfo = await blockRepo.search({ order: "desc" }).toPromise();
 rootHash = blockInfo.data[0].stateHashSubCacheMerkleRoots[8];
 
-//Obtaining merkle information from any node, including service providers
+//Recuperare le informazioni merkle da qualsiasi nodo, compresi i service provider
 stateProof = await stateProofService.metadataById(compositeHash).toPromise();
 
-//Verification
+//Verifica
 checkState(stateProof, stateHash, pathHash, rootHash);
 ```
 
-### 13.3.3 Verification of metadata registered to an account
+### 13.3.3 Verifica dei metadati registrati in un Indirizzo
 
-Metadata values are registered in the account as a leaf. Trace the branches on the Merkle tree by the hash value consisting of the metadata key, and confirm whether the root can be reached.
+I metadati sono registrati in un Indirizzo a livello foglia. Visitare i rami di un albero Merkle usando il valore hash della chiave del metadato, fino al raggiungimento della radica.
 
 ```js
 srcAddress = Buffer.from(
@@ -522,24 +523,23 @@ hasher.update(cat.GeneratorUtils.uintToBuffer(value.length, 2));
 hasher.update(value);
 stateHash = hasher.hex();
 
-//Obtaining up-to-date block header information from non-service provider nodes
+//Recupero informazione aggiornata dell'intestazione del blocco da nodi non service provider
 blockInfo = await blockRepo.search({ order: "desc" }).toPromise();
 rootHash = blockInfo.data[0].stateHashSubCacheMerkleRoots[8];
 
-//Obtaining merkle information from any node, including service providers
+//Recupero delle informazioni merkle da un nodo qualsiasi, inclusi i service provider
 stateProof = await stateProofService.metadataById(compositeHash).toPromise();
 
-//Verification
+//Verifica
 checkState(stateProof, stateHash, pathHash, rootHash);
 ```
 
-## 13.4 Tips for use
+## 13.4 Consigli pratici
 
 ### Trusted web
 
-A simple explanation of the “Trusted Web” is the realisation of a Web where everything is platform-independent and nothing needs to be verified.
+Per dare una descrizione semplice del "Trusted Web" si può immaginare un Web in cui ogni applicazione è indipendente dalla piattaforma e non richiede di essere verificata.
+I metodi di verifica esposti in questo capitolo mostrano che tutte le informazioni contenute nella blockchain si possono verificare attraverso dei valori hash partendo dall'intestazione del blocco. Le blockchain si fondano sulla condivisione di intestazioni di blocchi oggetto di accordo tra tutti i partecipanti alla rete e l'esistenza di tali partecipanti quali nodi replica. Tuttavia, rimane un problema aperto la realizzazione di un ambiente per la loro verifica che copra tutte le situazioni possibili di utilizzo della blockchain.
 
-What the verification methods in this chapter shows is that all information held by the blockchain can be verified by the hash value of the block header. Blockchains are based on the sharing of block headers that everyone agrees upon and the existence of full nodes that can reproduce them. However, it is challenging to maintain an environment to verify these in every situation where you want to utilise the blockchain.
-
-If the latest block headers are constantly broadcast from multiple trusted institutions, this can greatly reduce the need for verification. Such an infrastructure would allow access to trusted information even in places beyond the capabilities of the blockchain, such as urban areas where tens of millions of people are densely populated, or in remote areas where base stations cannot be adequately deployed, or during wide-area network outages during disasters.
+Se le intestazioni degli ultimi blocchi generati vengono continuamente notificate nella rete da più enti di fiducia, le operazioni di verifica potranno ridursi ai minimi termini. Una tale infrastruttura garantirebbe l'accesso a informazioni consistenti e sicure, oltre la sfera di azione della blockchain, si pensi alle aree urbane densamente popolate da decine di milioni di persone, o in zone remote in cui le stazioni base non possono venire predisposte in modo adeguato, o ancora in caso di disastri che colpiscono le reti WAN.
 
